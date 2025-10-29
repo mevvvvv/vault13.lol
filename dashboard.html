@@ -6,81 +6,434 @@
   <title>Vault 13 – Dashboard</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap"
-        rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-  <!-- ==== ALL CSS (copy-paste from your original page) ==== -->
   <style>
-    :root{--bg:#000;--card-bg:rgba(15,15,30,.6);--card-bg-solid:rgba(10,10,25,.8);--border:rgba(138,43,226,.3);--glow-inner:inset 0 0 25px rgba(138,43,226,.3);--glow-outer:0 0 35px rgba(138,43,226,.6);--accent:#8a2be2;--accent2:#00d4ff;--text:#e0d9ff;--text-dim:#b19cd9;--input-bg:rgba(20,20,50,.7);--transition:all .4s cubic-bezier(.23,1,.32,1)}
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#000;color:var(--text);font-family:'Roboto Mono',monospace;height:100vh;overflow:hidden;display:flex;justify-content:center;align-items:center;cursor:none}
-    button,input,a,select,textarea{cursor:none}
-    .crosshair{position:fixed;width:20px;height:20px;pointer-events:none;z-index:9999 transforming:translate(-50%,-50%);background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%238a2be2" d="M9 2h2v16H9z"/><path fill="%238a2be2" d="M2 9h16v2H2z"/></svg>') center/contain no-repeat;filter:drop-shadow(0 0 8px var(--accent2));animation:pulseCross 2s infinite;display:none}
-    @keyframes pulseCross{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.15)}}
-    input,select,textarea{width:100%;padding:1.1rem 1rem;background:var(--input-bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:1.1rem;outline:none;transition:var(--transition);box-shadow:var(--glow-inner);backdrop-filter:blur(12px)}
-    input::placeholder,textarea::placeholder{color:#8a2be288;font-style:italic}
-    input:focus,select:focus,textarea:focus{border-color:var(--accent2);box-shadow:var(--glow-inner),0 0 0 3px rgba(0,212,255,.4);background:rgba(25,25,55,.9)}
-    select{background:var(--input-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a2be2' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E") no-repeat right 1rem center/12px}
-    input[type=checkbox]{appearance:none;width:20px;height:20px;border:2px solid var(--border);border-radius:6px;background:var(--input-bg);position:relative;transition:var(--transition)}
-    input[type=checkbox]:checked{background:var(--accent2);border-color:var(--accent2)}
-    input[type=checkbox]:checked::after{content:"Check";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#000;font-size:12px}
-    .stars{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-    .stars::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(138,43,226,.15),transparent 50%),radial-gradient(circle at 80% 20%,rgba(0,212,255,.15),transparent 50%);animation:nebulaPulse 12s infinite}
-    .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s infinite}
-    @keyframes nebulaPulse{0%,100%{opacity:.7}50%{opacity:1}}
-    @keyframes twinkle{0%,100%{opacity:0;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
-    .grid{position:absolute;inset:0;background:linear-gradient(rgba(138,43,226,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 25s linear infinite;opacity:0;transition:1.5s}
-    @keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(-60px,-60px)}}
-    .scanline{position:absolute;top:0;width:100%;height:3px;background:linear-gradient(to bottom,transparent,var(--accent2),transparent);animation:scan 7s linear infinite;opacity:0}
-    @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
-    .dashboard{position:fixed;inset:0;display:grid;grid-template-columns:260px 1fr;z-index:300;opacity:0;visibility:hidden;transition:1s}
-    .dashboard.active{opacity:1;visibility:visible}
-    .sidebar{background:var(--card-bg-solid);padding:1.5rem;border-right:1px solid var(--border);overflow-y:auto;box-shadow:var(--glow-inner);backdrop-filter:blur(12px)}
-    .site-name{display:flex;align-items:center;gap:.8rem;margin-bottom:1.5rem;font:1.3rem 'Orbitron',sans-serif;color:var(--text);text-shadow:0 0 20px var(--accent)}
-    .logo-small{width:44px;height:44px;border-radius:50%;background:#222 center/cover no-repeat;border:2px solid var(--border);box-shadow:var(--glow-inner)}
-    .admin-badge{background:linear-gradient(135deg,#8a2be2,#00d4ff);color:#000;font-size:.65rem;padding:.25rem .6rem;border-radius:6px;font-weight:900;letter-spacing:1.5px;margin-left:auto;box-shadow:0 0 20px rgba(138,43,226,.8)}
-    .nav-item{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;margin:.3rem 0;border-radius:10px;color:#b19cd9;font-size:.9rem;transition:var(--transition);background:var(--card-bg);border:1px solid var(--border);box-shadow:var(--glow-inner);backdrop-filter:blur(12px)}
-    .nav-item:hover,.nav-item.active{background:rgba(138,43,226,.25);color:var(--text);box-shadow:var(--glow-inner),0 0 20px rgba(138,43,226,.4)}
-    .nav-item i{font-size:.9rem;color:#8a2be288}
-    .main{padding:2rem;overflow-y:auto}
-    .section-title{font-size:1.4rem;margin-bottom:1.8rem;color:var(--text);text-shadow:0 0 20px var(--accent);font-weight:700}
-    .vault-status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem}
-    .status-card{background:var(--card-bg);padding:1.6rem;border-radius:16px;border:1px solid var(--border);box-shadow:var(--glow-inner);backdrop-filter:blur(14px);text-align:center;transition:var(--transition)}
-    .status-card:hover{transform:translateY(-6px);box-shadow:var(--glow-inner),var(--glow-outer)}
-    .status-icon{font-size:2.2rem;margin-bottom:.8rem;color:var(--accent2);text-shadow:0 0 15px var(--accent2)}
-    .status-label{font-size:.95rem;color:var(--text-dim);margin-bottom:.4rem;letter-spacing:1px}
-    .status-value{font-size:1.2rem;font-weight:700;color:var(--text);text-shadow:0 0 12px var(--accent);word-break:break-all;padding:0 .5rem}
-    .overview-card{background:var(--card-bg);padding:1.6rem;border-radius:16px;border:1px solid var(--border);box-shadow:var(--glow-inner);backdrop-filter:blur(14px);margin-bottom:1.6rem}
-    .overview-card-title{font-size:1.1rem;font-weight:700;color:var(--accent2);margin-bottom:1rem;text-transform:uppercase;letter-spacing:1.5px;text-shadow:0 0 12px var(--accent2);display:flex;align-items:center;gap:.5rem}
-    .overview-card-content{font-size:.95rem;color:#ccc;line-height:1.5}
-    .overview-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem}
-    .customize-group,.admin-group{background:var(--card-bg);padding:1.6rem;border-radius:16px;border:1px solid var(--border);box-shadow:var(--glow-inner);backdrop-filter:blur(14px);margin-bottom:1.6rem}
-    .group-title{font-size:1.1rem;font-weight:700;color:var(--accent2);margin-bottom:1.2rem;text-transform:uppercase;letter-spacing:1.5px;text-shadow:0 0 12px var(--accent2)}
-    .social-input{display:flex;gap:.6rem;align-items:center;margin-bottom:.6rem}
-    .social-input button{background:rgba(255,0,0,.2);color:#ff6666;border:1px solid rgba(255,0,0,.3);padding:.5rem .9rem;font-size:.8rem;border-radius:10px}
-    .avatar-preview,.music-preview{width:150px;height:150px;border:2px solid var(--border);border-radius:50%;margin:0 auto 1rem;background:#222 center/cover no-repeat;box-shadow:var(--glow-inner)}
-    .music-preview{border-radius:14px;height:65px;background:var(--card-bg-solid);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:.95rem;padding:0 1rem}
-    .upload-label{display:inline-block;padding:.7rem 1.4rem;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;transition:var(--transition);box-shadow:var(--glow-inner);font-size:.95rem;backdrop-filter:blur(12px);cursor:none}
-    .upload-label:hover{background:rgba(0,212,255,.2);box-shadow:var(--glow-inner),var(--glow-outer);color:var(--text)}
-    .btn{width:100%;padding:1.3rem;margin-top:1.3rem;background:var(--card-bg);color:var(--text);font:700 1.1rem 'Orbitron',sans-serif;text-transform:uppercase;letter-spacing:3px;border:1px solid var(--border);border-radius:12px;transition:var(--transition);box-shadow:var(--glow-inner);position:relative;overflow:hidden;backdrop-filter:blur(12px)}
-    .btn:hover{transform:translateY(-4px);box-shadow:var(--glow-inner),var(--glow-outer)}
-    .btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--accent2),transparent);transition:.7s}
-    .btn:hover::before{left:100%}
+    :root {
+      --bg: #000;
+      --card-bg: rgba(15,15,30,.6);
+      --card-bg-solid: rgba(10,10,25,.8);
+      --border: rgba(138,43,226,.3);
+      --glow-inner: inset 0 0 25px rgba(138,43,226,.3);
+      --glow-outer: 0 0 35px rgba(138,43,226,.6);
+      --accent: #8a2be2;
+      --accent2: #00d4ff;
+      --text: #e0d9ff;
+      --text-dim: #b19cd9;
+      --input-bg: rgba(20,20,50,.7);
+      --transition: all .4s cubic-bezier(.23,1,.32,1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Roboto Mono', monospace;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: none;
+    }
+    button, input, a, select, textarea { cursor: none; }
+
+    /* Crosshair Cursor */
+    .crosshair {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%238a2be2" d="M9 2h2v16H9z"/><path fill="%238a2be2" d="M2 9h16v2H2z"/></svg>') center/contain no-repeat;
+      filter: drop-shadow(0 0 8px var(--accent2));
+      animation: pulseCross 2s infinite;
+      display: none;
+    }
+    @keyframes pulseCross {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.15); }
+    }
+
+    /* Inputs */
+    .input-group { margin: 1rem 0; }
+    input, select, textarea {
+      width: 100%;
+      padding: 1.1rem 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 1.1rem;
+      outline: none;
+      transition: var(--transition);
+      box-shadow: var(--glow-inner);
+      backdrop-filter: blur(12px);
+    }
+    input::placeholder, textarea::placeholder {
+      color: #8a2be288;
+      font-style: italic;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent2);
+      box-shadow: var(--glow-inner), 0 0 0 3px rgba(0,212,255,.4);
+      background: rgba(25,25,55,.9);
+    }
+    select {
+      background: var(--input-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a2be2' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E") no-repeat right 1rem center/12px;
+    }
+    input[type="checkbox"] {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      position: relative;
+      transition: var(--transition);
+      cursor: none;
+    }
+    input[type="checkbox"]:checked {
+      background: var(--accent2);
+      border-color: var(--accent2);
+    }
+    input[type="checkbox"]:checked::after {
+      content: "\f00c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #000;
+      font-size: 12px;
+    }
+
+    /* Background Effects */
+    .stars { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .stars::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 80%, rgba(138,43,226,.15), transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(0,212,255,.15), transparent 50%);
+      animation: nebulaPulse 12s infinite;
+    }
+    .star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle 3s infinite; }
+    @keyframes nebulaPulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+    @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(138,43,226,.03) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0,212,255,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 25s linear infinite;
+      opacity: 0;
+      transition: 1.5s;
+    }
+    @keyframes gridMove { 0% { transform: translate(0,0); } 100% { transform: translate(-60px,-60px); } }
+
+    .scanline {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(to bottom, transparent, var(--accent2), transparent);
+      animation: scan 7s linear infinite;
+      opacity: 0;
+    }
+    @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+
+    /* Dashboard Layout */
+    .dashboard {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      z-index: 300;
+      opacity: 0;
+      visibility: hidden;
+      transition: 1s;
+    }
+    .dashboard.active { opacity: 1; visibility: visible; }
+
+    .sidebar {
+      background: var(--card-bg-solid);
+      padding: 1.5rem;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      box-shadow: var(--glow-inner);
+      backdrop-filter: blur(12px);
+    }
+    .site-name {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      margin-bottom: 1.5rem;
+      font: 1.3rem 'Orbitron', sans-serif;
+      color: var(--text);
+      text-shadow: 0 0 20px var(--accent);
+    }
+    .logo-small {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #222 center/cover no-repeat;
+      border: 2px solid var(--border);
+      box-shadow: var(--glow-inner);
+    }
+    .admin-badge {
+      background: linear-gradient(135deg, #8a2be2, #00d4ff);
+      color: #000;
+      font-size: .65rem;
+      padding: .25rem .6rem;
+      border-radius: 6px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      margin-left: auto;
+      box-shadow: 0 0 20px rgba(138,43,226,.8);
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .7rem .9rem;
+      margin: .3rem 0;
+      border-radius: 10px;
+      color: #b19cd9;
+      font-size: .9rem;
+      transition: var(--transition);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: var(--glow-inner);
+      backdrop-filter: blur(12px);
+    }
+    .nav-item:hover, .nav-item.active {
+      background: rgba(138,43,226,.25);
+      color: var(--text);
+      box-shadow: var(--glow-inner), 0 0 20px rgba(138,43,226,.4);
+    }
+    .nav-item i { font-size: .9rem; color: #8a2be288; }
+
+    .main { padding: 2rem; overflow-y: auto; }
+    .section-title {
+      font-size: 1.4rem;
+      margin-bottom: 1.8rem;
+      color: var(--text);
+      text-shadow: 0 0 20px var(--accent);
+      font-weight: 700;
+    }
+
+    .vault-status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .status-card {
+      background: var(--card-bg);
+      padding: 1.6rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--glow-inner);
+      backdrop-filter: blur(14px);
+      text-align: center;
+      transition: var(--transition);
+    }
+    .status-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--glow-inner), var(--glow-outer);
+    }
+    .status-icon {
+      font-size: 2.2rem;
+      margin-bottom: .8rem;
+      color: var(--accent2);
+      text-shadow: 0 0 15px var(--accent2);
+    }
+    .status-label {
+      font-size: .95rem;
+      color: var(--text-dim);
+      margin-bottom: .4rem;
+      letter-spacing: 1px;
+    }
+    .status-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      text-shadow: 0 0 12px var(--accent);
+      word-break: break-all;
+      padding: 0 .5rem;
+    }
+
+    .overview-card {
+      background: var(--card-bg);
+      padding: 1.6rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--glow-inner);
+      backdrop-filter: blur(14px);
+      margin-bottom: 1.6rem;
+    }
+    .overview-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 12px var(--accent2);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .overview-card-content {
+      font-size: .95rem;
+      color: #ccc;
+      line-height: 1.5;
+    }
+    .overview-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .customize-group, .admin-group {
+      background: var(--card-bg);
+      padding: 1.6rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--glow-inner);
+      backdrop-filter: blur(14px);
+      margin-bottom: 1.6rem;
+    }
+    .group-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 12px var(--accent2);
+    }
+    .social-input {
+      display: flex;
+      gap: .6rem;
+      align-items: center;
+      margin-bottom: .6rem;
+    }
+    .social-input button {
+      background: rgba(255,0,0,.2);
+      color: #ff6666;
+      border: 1px solid rgba(255,0,0,.3);
+      padding: .5rem .9rem;
+      font-size: .8rem;
+      border-radius: 10px;
+      cursor: none;
+    }
+    .avatar-preview, .music-preview {
+      width: 150px;
+      height: 150px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      background: #222 center/cover no-repeat;
+      box-shadow: var(--glow-inner);
+    }
+    .music-preview {
+      border-radius: 14px;
+      height: 65px;
+      background: var(--card-bg-solid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: .95rem;
+      padding: 0 1rem;
+    }
+    .upload-label {
+      display: inline-block;
+      padding: .7rem 1.4rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: var(--transition);
+      box-shadow: var(--glow-inner);
+      font-size: .95rem;
+      backdrop-filter: blur(12px);
+      cursor: none;
+    }
+    .upload-label:hover {
+      background: rgba(0,212,255,.2);
+      box-shadow: var(--glow-inner), var(--glow-outer);
+      color: var(--text);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1.3rem;
+      margin-top: 1.3rem;
+      background: var(--card-bg);
+      color: var(--text);
+      font: 700 1.1rem 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: var(--transition);
+      box-shadow: var(--glow-inner);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      cursor: none;
+    }
+    .btn:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--glow-inner), var(--glow-outer);
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+      transition: .7s;
+    }
+    .btn:hover::before { left: 100%; }
+
+    .user-item {
+      padding: .8rem;
+      background: rgba(138,43,226,.1);
+      border-radius: 10px;
+      margin-bottom: .6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .9rem;
+    }
+    .verify-toggle {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .9rem;
+      color: #b19cd9;
+    }
+    .verify-toggle input { margin: 0; }
   </style>
 </head>
 <body>
-
-  <!-- Background effects -->
+  <!-- Background Effects -->
   <div class="crosshair" id="crosshair"></div>
   <div class="stars" id="stars"></div>
   <div class="grid" id="grid"></div>
   <div class="scanline" id="scanline"></div>
 
-  <!-- ==== FULL DASHBOARD MARKUP ==== -->
+  <!-- Dashboard -->
   <div class="dashboard" id="dashboard">
     <div class="sidebar">
       <div class="site-name">
@@ -187,14 +540,25 @@
     </div>
   </div>
 
-  <!-- ==== ALL JAVASCRIPT (self-contained) ==== -->
   <script>
-    // ---------- Helpers ----------
+    // Platforms must be defined first
+    const platforms = {
+      discord: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg', format: u => u.includes('discord.gg/') ? u : `https://discord.gg/${u}` },
+      twitter: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg', format: u => `https://twitter.com/${u}` },
+      instagram: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg', format: u => `https://instagram.com/${u}` },
+      twitch: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg', format: u => `https://twitch.tv/${u}` },
+      github: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg', format: u => `https://github.com/${u}` },
+      youtube: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg', format: u => `https://youtube.com/@${u}` },
+      tiktok: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg', format: u => `https://tiktok.com/@${u}` },
+      spotify: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg', format: u => `https://open.spotify.com/user/${u}` },
+      steam: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg', format: u => `https://steamcommunity.com/id/${u}` },
+      reddit: { icon: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg', format: u => `https://reddit.com/user/${u}` }
+    };
+
     const $ = id => document.getElementById(id);
     let user = null, isAdmin = false;
     const startTime = Date.now();
 
-    // ---------- Background ----------
     function createStars() {
       const container = $('stars');
       for (let i = 0; i < 80; i++) {
@@ -221,7 +585,7 @@
       if ($('visitorCount')) $('visitorCount').textContent = `${count} visitors in orbit`;
     }
 
-    // ---------- Crosshair ----------
+    // Crosshair cursor
     document.addEventListener('mousemove', e => {
       const c = $('crosshair');
       c.style.left = e.clientX + 'px';
@@ -229,7 +593,6 @@
       c.style.display = 'block';
     });
 
-    // ---------- Dashboard entry ----------
     function goDash(u) {
       user = u;
       const p = JSON.parse(localStorage.getItem(`profile_${u}`)) || {};
@@ -238,24 +601,20 @@
       $('adminBadge').style.display = isAdmin ? 'inline' : 'none';
       document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
 
-      // basic fields
       $('dashUser').textContent = u;
       $('dashDisplayName').textContent = p.name || u;
       $('dashUsername').textContent = `@${u}`;
       $('urlUser').textContent = u;
 
-      // views
       let v = parseInt(localStorage.getItem(`views_${u}`) || '0') + 1;
       localStorage.setItem(`views_${u}`, v);
       animateValue('profileViews', 0, v, 800);
 
-      // other stats
       $('socialCount').textContent = (p.links || []).length;
       $('musicStatus').textContent = p.mp3 ? 'Active' : 'None';
       $('verifiedStatus').textContent = p.verified ? 'Yes' : 'No';
       $('totalUsers').textContent = Object.keys(localStorage).filter(k => k.startsWith('profile_')).length;
 
-      // welcome text
       if (isAdmin) {
         $('welcomeTitle').innerHTML = `Hello, ${p.name || u} <span class="admin-badge">FOUNDER</span>`;
         $('welcomeText').textContent = 'As a Founder, you oversee the Vault 13 social sharing platform...';
@@ -264,16 +623,12 @@
         $('welcomeText').textContent = 'Vault 13 is your social sharing platform to connect, customize...';
       }
 
-      // avatar
       setAvatar(p.avatar);
-
-      // customize fields
       $('displayName').value = p.name || u;
       $('bio').value = p.bio || '';
       $('customBg').value = p.bg || '';
       $('musicPreview').textContent = p.mp3 ? 'Music loaded' : 'No music';
       loadLinks(p.links || []);
-
       if (isAdmin) loadAdminPanel();
 
       $('dashboard').classList.add('active');
@@ -297,7 +652,6 @@
       $('sidebarAvatar').style.backgroundImage = `url(${url})`;
     }
 
-    // ---------- Social links ----------
     function loadLinks(arr) {
       const container = $('socialLinks');
       container.innerHTML = '';
@@ -318,26 +672,24 @@
       $('socialLinks').appendChild(div);
     }
 
-    // ---------- Save customize ----------
+    $('addSocial').onclick = () => addLinkInput();
+
     $('saveCustomize').onclick = () => {
       const p = JSON.parse(localStorage.getItem(`profile_${user}`)) || {};
       p.name = $('displayName').value.trim() || user;
       p.bio = $('bio').value.trim();
       p.bg = $('customBg').value.trim();
-
       p.links = [];
       document.querySelectorAll('#socialLinks .social-input').forEach(d => {
         const plat = d.children[0].value.trim();
         const name = d.children[1].value.trim();
-        if (plat && name) p.links.push({platform: plat, username: name});
+        if (plat && name) p.links.push({ platform: plat, username: name });
       });
-
       localStorage.setItem(`profile_${user}`, JSON.stringify(p));
       alert('Saved!');
-      goDash(user);   // refresh UI
+      goDash(user);
     };
 
-    // ---------- File uploads ----------
     $('avatarInput').onchange = e => {
       const f = e.target.files[0];
       if (!f) return;
@@ -367,7 +719,6 @@
       r.readAsDataURL(f);
     };
 
-    // ---------- Navigation ----------
     document.querySelectorAll('.nav-item[data-section]').forEach(n => {
       n.onclick = () => {
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -378,13 +729,17 @@
       };
     });
 
-    // ---------- Logout ----------
     $('logoutBtn').onclick = () => {
       $('dashboard').classList.remove('active');
       setTimeout(() => location.href = 'index.html', 800);
     };
 
-    // ---------- Admin panel ----------
+    // FIXED: View Profile → opens profile.html?u=username
+    $('viewProfileBtn').onclick = () => {
+      const profileUrl = `${location.origin}${location.pathname.replace('dashboard.html', '')}profile.html?u=${user}`;
+      window.open(profileUrl, '_blank');
+    };
+
     function loadAdminPanel() {
       const users = Object.keys(localStorage).filter(k => k.startsWith('profile_')).map(k => k.replace('profile_', ''));
       $('totalUsersAdmin').textContent = users.length;
@@ -398,7 +753,7 @@
           <span>@${u}</span>
           <div>
             <label class="verify-toggle">
-              <input type="checkbox" ${p.verified?'checked':''} onchange="toggleVerify('${u}',this.checked)">
+              <input type="checkbox" ${p.verified ? 'checked' : ''} onchange="toggleVerify('${u}', this.checked)">
               Verified
             </label>
             <button onclick="deleteUser('${u}')">Delete</button>
@@ -407,12 +762,14 @@
         list.appendChild(div);
       });
     }
+
     window.toggleVerify = (u, checked) => {
       const p = JSON.parse(localStorage.getItem(`profile_${u}`)) || {};
       p.verified = checked;
       localStorage.setItem(`profile_${u}`, JSON.stringify(p));
       if (u === user) $('verifiedStatus').textContent = checked ? 'Yes' : 'No';
     };
+
     window.deleteUser = u => {
       if (confirm(`Delete @${u}?`)) {
         localStorage.removeItem(`profile_${u}`);
@@ -422,13 +779,20 @@
       }
     };
 
-    // ---------- Admin buttons ----------
-    $('clearAllBtn').onclick = () => { if (confirm('ERASE ALL DATA?')) localStorage.clear(); location.reload(); };
+    $('clearAllBtn').onclick = () => {
+      if (confirm('ERASE ALL DATA?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    };
     $('exportBtn').onclick = () => {
       const data = JSON.stringify(localStorage);
-      const blob = new Blob([data], {type:'application/json'});
+      const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'vault13_backup.json'; a.click();
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vault13_backup.json';
+      a.click();
     };
     $('resetViewsBtn').onclick = () => {
       Object.keys(localStorage).filter(k => k.startsWith('views_')).forEach(k => localStorage.removeItem(k));
@@ -436,21 +800,6 @@
     };
     $('forceLogoutBtn').onclick = () => alert('Not implemented in localStorage mode.');
 
-    // ---------- Social platform icons ----------
-    const platforms = {
-      discord:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg',format:u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`},
-      twitter:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg',format:u=>`https://twitter.com/${u}`},
-      instagram:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg',format:u=>`https://instagram.com/${u}`},
-      twitch:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg',format:u=>`https://twitch.tv/${u}`},
-      github:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg',format:u=>`https://github.com/${u}`},
-      youtube:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg',format:u=>`https://youtube.com/@${u}`},
-      tiktok:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg',format:u=>`https://tiktok.com/@${u}`},
-      spotify:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg',format:u=>`https://open.spotify.com/user/${u}`},
-      steam:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg',format:u=>`https://steamcommunity.com/id/${u}`},
-      reddit:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg',format:u=>`https://reddit.com/user/${u}`}
-    };
-
-    // ---------- Init ----------
     window.onload = () => {
       createStars();
       $('stars').style.opacity = '1';

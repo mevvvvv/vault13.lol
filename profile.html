@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vault 13 – Profile</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- BACKGROUND EFFECTS -->
+  <div class="crosshair" id="crosshair"></div>
+  <div class="stars" id="stars"></div>
+  <div class="grid" id="grid"></div>
+  <div class="scanline" id="scanline"></div>
+
+  <!-- PROFILE PAGE (same markup as original) -->
+  <div class="profile-page" id="profilePage">
+    <div class="profile-bg" id="profileBg"></div>
+
+    <div class="profile-sidebar" id="profileSidebar">
+      <div class="profile-nav-item" id="backToDashBtn"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+      <div class="profile-nav-item" id="profileLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
+
+    <div style="text-align:center;position:relative;z-index:2;">
+      <div class="profile-avatar" id="profileAvatar" style="position:relative;">
+        <div id="verifiedBadge" class="verified-check" style="display:none;"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="profile-username" id="profileUsername"></div>
+      <div id="adminTitleDisplay" class="admin-title" style="display:none;"></div>
+      <div class="profile-bio" id="profileBio"></div>
+    </div>
+
+    <div class="profile-links" id="profileLinks"></div>
+    <audio id="bgAudio" loop autoplay></audio>
+    <div class="visitor" id="visitorCount">4 visitors in orbit</div>
+  </div>
+
+  <script src="assets/script.js"></script>
+  <script>
+    // === DYNAMIC PROFILE LOADER ===
+    const path = location.pathname; // e.g. "/cry"
+    const username = path.slice(1).toLowerCase().trim();
+
+    // Redirect root to index
+    if (!username) {
+      location.href = 'index.html';
+      throw new Error('No username');
+    }
+
+    // Check if user exists
+    const profileKey = `profile_${username}`;
+    const profileData = localStorage.getItem(profileKey);
+
+    if (!profileData) {
+      alert(`User @${username} not found.`);
+      location.href = 'index.html';
+      throw new Error('User not found');
+    }
+
+    // === LOAD PROFILE ===
+    const p = JSON.parse(profileData);
+
+    // Set page title
+    document.title = `Vault 13 – @${p.name || username}`;
+
+    // Populate profile
+    $('profileUsername').textContent = p.name || username;
+    $('profileBio').textContent = p.bio || 'No bio yet.';
+    $('profileBg').style.background = p.bg || 'var(--bg)';
+
+    // Avatar
+    setAvatar(p.avatar);
+
+    // Verified badge
+    $('verifiedBadge').style.display = p.verified ? 'flex' : 'none';
+
+    // Admin title (if any)
+    if (p.title) {
+      $('adminTitleDisplay').textContent = p.title;
+      $('adminTitleDisplay').style.display = 'block';
+    }
+
+    // Social links
+    const linksContainer = $('profileLinks');
+    linksContainer.innerHTML = '';
+    p.links.forEach(l => {
+      const plat = l.platform.toLowerCase();
+      if (platforms[plat]) {
+        const a = document.createElement('a');
+        a.href = platforms[plat].format(l.username);
+        a.target = '_blank';
+        a.className = 'profile-link';
+        a.style.backgroundImage = `url(${platforms[plat].icon})`;
+        linksContainer.appendChild(a);
+      }
+    });
+
+    // Background music
+    const audio = $('bgAudio');
+    if (p.mp3) {
+      audio.src = p.mp3;
+      audio.play().catch(() => console.log('Autoplay prevented'));
+    }
+
+    // Show sidebar only if you're viewing your own profile
+    const currentUser = new URLSearchParams(location.search).get('u') || localStorage.getItem('currentUser');
+    $('profileSidebar').classList.toggle('active', currentUser === username);
+
+    // Increment view count
+    let views = parseInt(localStorage.getItem(`views_${username}`) || '0') + 1;
+    localStorage.setItem(`views_${username}`, views);
+
+    // Activate page
+    $('profilePage').classList.add('active');
+
+    // === BACKGROUND EFFECTS ===
+    createStars();
+    $('stars').style.opacity = '1';
+    $('grid').style.opacity = '1';
+    $('scanline').style.opacity = '1';
+    setInterval(updateVisitors, 3000);
+
+    // === SIDEBAR ACTIONS (only if own profile) ===
+    $('backToDashBtn')?.addEventListener('click', () => {
+      location.href = `dashboard.html?u=${username}`;
+    });
+
+    $('profileLogoutBtn')?.addEventListener('click', () => {
+      localStorage.removeItem('currentUser');
+      location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vault 13 – Login</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <div class="crosshair" id="crosshair"></div>
+  <div class="stars" id="stars"></div>
+  <div class="grid" id="grid"></div>
+  <div class="scanline" id="scanline"></div>
+
+  <div class="auth-page active" id="loginPage">
+    <div class="logo"></div>
+    <h1>VAULT 13</h1>
+    <div class="owner">Owner @w8.it</div>
+    <form id="loginForm">
+      <div class="input-group"><input type="text" id="loginUser" placeholder="USERNAME" required /></div>
+      <div class="input-group"><input type="password" id="loginPass" placeholder="PASSWORD" required /></div>
+      <button type="submit" class="btn">LOGIN</button>
+    </form>
+    <div class="links"><a href="signup.html">Create Account</a></div>
+    <div class="terminal" id="loginTerminal">root@vault13:~$ login_awaiting_</div>
+  </div>
+
+  <script src="assets/script.js"></script>
+  <script>
+    createStars();
+    $('stars').style.opacity = '1';
+    $('grid').style.opacity = '1';
+    $('scanline').style.opacity = '1';
+    setInterval(updateVisitors, 3000);
+
+    $('loginForm').onsubmit = e => {
+      e.preventDefault();
+      const u = $('loginUser').value.trim().toLowerCase();
+      const p = $('loginPass').value;
+      const data = localStorage.getItem(`profile_${u}`);
+      if (data && JSON.parse(data).pass === p) {
+        term('loginTerminal','access_granted_','#8a2be2',true);
+        setTimeout(() => goToDashboard(u), 1200);
+      } else {
+        term('loginTerminal','access_denied_','#f00');
+      }
+    };
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>@username – Vault 13</title>
+  <title>@user – Vault 13</title>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
@@ -14,14 +14,13 @@
       --bg:#000;--card-bg:rgba(15,15,30,.6);--border:rgba(138,43,226,.3);
       --glow-inner:inset 0 0 25px rgba(138,43,226,.3);--glow-outer:0 0 35px rgba(138,43,226,.6);
       --accent:#8a2be2;--accent2:#00d4ff;--text:#e0d9ff;--text-dim:#b19cd9;
-      --transition:all .4s cubic-bezier(.23,1,.32,1)
+      --input-bg:rgba(20,20,50,.7);--transition:all .4s cubic-bezier(.23,1,.32,1)
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{
-      background:#000;color:var(--text);font-family:'Roboto Mono',monospace;
+      background:var(--profile-bg,#000);background-size:cover;background-position:center;
+      color:var(--text);font-family:'Roboto Mono',monospace;
       min-height:100vh;overflow-x:hidden;cursor:none;
-      background:var(--profile-bg, #000);
-      background-size:cover;background-position:center;
     }
     button,a{cursor:none}
 
@@ -68,8 +67,7 @@
       font-size:.95rem;color:var(--text-dim);margin-bottom:1rem;
     }
     .bio{
-      font-size:1rem;line-height:1.6;color:#ccc;margin:1.2rem 0;
-      padding:0 1rem;
+      font-size:1rem;line-height:1.6;color:#ccc;margin:1.2rem 0;padding:0 1rem;
     }
     .social-links{
       display:flex;gap:1rem;justify-content:center;margin:1.5rem 0;flex-wrap:wrap;
@@ -91,6 +89,35 @@
       font-weight:900;letter-spacing:1px;margin-left:.5rem;
       box-shadow:0 0 15px rgba(138,43,226,.7);
     }
+
+    /* ---- THEMED AUDIO PLAYER ---- */
+    .music-player{
+      margin-top:1.5rem;width:100%;max-width:420px;
+      background:var(--input-bg);padding:1.2rem 1.5rem;border-radius:14px;
+      border:1px solid var(--border);box-shadow:var(--glow-inner);
+      backdrop-filter:blur(12px);text-align:center;
+      display:flex;flex-direction:column;align-items:center;
+      gap:.8rem;
+    }
+    .music-player .title{
+      color:var(--accent2);font-weight:700;letter-spacing:1px;
+    }
+    .music-player audio{
+      width:100%;outline:none;
+      filter:drop-shadow(0 0 8px rgba(0,212,255,.4));
+    }
+    .play-pause{
+      width:44px;height:44px;background:var(--card-bg);border:1px solid var(--border);
+      border-radius:50%;display:flex;align-items:center;justify-content:center;
+      box-shadow:var(--glow-inner);transition:var(--transition);
+      cursor:none;
+    }
+    .play-pause:hover{
+      box-shadow:var(--glow-inner),var(--glow-outer);
+      transform:scale(1.08);
+    }
+    .play-pause svg{width:20px;height:20px;fill:var(--accent2)}
+
     .back-btn{
       margin-top:2rem;padding:.8rem 1.8rem;background:var(--card-bg);color:var(--text);
       border:1px solid var(--border);border-radius:12px;font:700 1rem 'Orbitron',sans-serif;
@@ -101,15 +128,8 @@
       transform:translateY(-4px);box-shadow:var(--glow-inner),var(--glow-outer);
     }
 
-    /* Music Player */
-    .music-player{
-      margin-top:1.5rem;width:100%;max-width:400px;
-      background:var(--card-bg);padding:1rem;border-radius:14px;
-      border:1px solid var(--border);box-shadow:var(--glow-inner);
-      backdrop-filter:blur(12px);text-align:center;
-    }
-    .music-player audio{
-      width:100%;margin-top:.5rem;outline:none;
+    .notfound{
+      text-align:center;margin-top:5rem;color:#ff6666;font-size:1.2rem;
     }
   </style>
 </head>
@@ -128,27 +148,28 @@
       <div class="social-links" id="socialLinks"></div>
 
       <div class="music-player" id="musicPlayer" style="display:none;">
-        <div style="color:var(--accent2);font-weight:700;margin-bottom:.5rem;">
-          Now Playing
-        </div>
+        <div class="title">Now Playing</div>
         <audio id="audioPlayer" controls></audio>
+        <button class="play-pause" id="playPauseBtn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
       </div>
 
-      <button class="back-btn" onclick="location.href='dashboard.html?u=' + user">Back to Dashboard</button>
+      <button class="back-btn" id="backBtn">Back to Dashboard</button>
     </div>
 
-    <div id="notFound" style="text-align:center;margin-top:5rem;color:#ff6666;font-size:1.2rem;display:none;">
+    <div class="notfound" id="notFound" style="display:none;">
       <i class="fas fa-exclamation-triangle" style="font-size:3rem;margin-bottom:1rem;"></i>
       <div>User not found.</div>
-      <button class="back-btn" style="margin-top:1rem;" onclick="location.href='index.html'">Go Home</button>
+      <button class="back-btn" style="margin-top:1rem;" onclick="location.href='/'">Go Home</button>
     </div>
   </div>
 
   <script>
     const $ = id => document.getElementById(id);
-    let user = null;
+    let user = null, audio = null;
 
-    // Crosshair
+    /* ---------- CROSSHAIR ---------- */
     document.addEventListener('mousemove', e => {
       const c = $('crosshair');
       c.style.left = e.clientX + 'px';
@@ -156,7 +177,7 @@
       c.style.display = 'block';
     });
 
-    // Stars
+    /* ---------- STARS ---------- */
     function createStars() {
       const container = $('stars');
       for (let i = 0; i < 60; i++) {
@@ -170,7 +191,7 @@
       }
     }
 
-    // Social Icons
+    /* ---------- SOCIAL ICONS ---------- */
     const platforms = {
       discord: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg',
       twitter: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg',
@@ -183,95 +204,124 @@
       steam: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg',
       reddit: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg'
     };
-
-    function formatLink(platform, username) {
+    function formatLink(p, u){
       const map = {
-        discord: u => u.includes('discord.gg/') ? u : `https://discord.gg/${u}`,
-        twitter: u => `https://twitter.com/${u}`,
-        instagram: u => `https://instagram.com/${u}`,
-        twitch: u => `https://twitch.tv/${u}`,
-        github: u => `https://github.com/${u}`,
-        youtube: u => `https://youtube.com/@${u}`,
-        tiktok: u => `https://tiktok.com/@${u}`,
-        spotify: u => `https://open.spotify.com/user/${u}`,
-        steam: u => `https://steamcommunity.com/id/${u}`,
-        reddit: u => `https://reddit.com/user/${u}`
+        discord: u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`,
+        twitter: u=>`https://twitter.com/${u}`,
+        instagram: u=>`https://instagram.com/${u}`,
+        twitch: u=>`https://twitch.tv/${u}`,
+        github: u=>`https://github.com/${u}`,
+        youtube: u=>`https://youtube.com/@${u}`,
+        tiktok: u=>`https://tiktok.com/@${u}`,
+        spotify: u=>`https://open.spotify.com/user/${u}`,
+        steam: u=>`https://steamcommunity.com/id/${u}`,
+        reddit: u=>`https://reddit.com/user/${u}`
       };
-      return map[platform] ? map[platform](username) : `#`;
+      return map[p]?map[p](u):'#';
     }
 
+    /* ---------- URL PARSING (pretty + fallback) ---------- */
+    function getUsername(){
+      // 1. Pretty URL: /profile/@mev
+      const path = location.pathname;
+      const prettyMatch = path.match(/^\/profile\/@([^\/]+)$/i);
+      if (prettyMatch) return prettyMatch[1];
+
+      // 2. Fallback: profile.html?u=mev
+      const params = new URLSearchParams(location.search);
+      return params.get('u');
+    }
+
+    /* ---------- PLAY/PAUSE BUTTON ---------- */
+    function togglePlayPause(){
+      if (!audio) return;
+      if (audio.paused){
+        audio.play().catch(()=>{});               // muted auto-play fallback
+        $('playPauseBtn').innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>`;
+      } else {
+        audio.pause();
+        $('playPauseBtn').innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+      }
+    }
+
+    /* ---------- MAIN LOAD ---------- */
     window.onload = () => {
       createStars();
       $('stars').style.opacity = '1';
 
-      const params = new URLSearchParams(location.search);
-      user = params.get('u');
-      if (!user) {
+      user = getUsername();
+      if (!user){
         $('notFound').style.display = 'block';
         return;
       }
 
       const profile = JSON.parse(localStorage.getItem(`profile_${user}`));
-      if (!profile) {
+      if (!profile){
         $('notFound').style.display = 'block';
         return;
       }
 
-      // Set page title
+      // ---- Page title & background ----
       document.title = `@${user} – Vault 13`;
-
-      // Background
-      if (profile.bg) {
+      if (profile.bg){
         document.body.style.background = profile.bg;
         document.body.style.backgroundSize = 'cover';
         document.body.style.backgroundPosition = 'center';
       }
 
-      // Avatar
+      // ---- Avatar ----
       const avatarUrl = profile.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
       $('avatar').style.backgroundImage = `url(${avatarUrl})`;
 
-      // Name & Username
+      // ---- Name / Verified ----
       $('displayName').textContent = profile.name || user;
-      if (profile.verified) {
+      if (profile.verified){
         $('displayName').innerHTML += ` <span class="verified-badge">VERIFIED</span>`;
       }
       $('username').textContent = `@${user}`;
 
-      // Bio
+      // ---- Bio ----
       $('bio').textContent = profile.bio || 'No bio yet.';
 
-      // Social Links
-      const linksContainer = $('socialLinks');
-      linksContainer.innerHTML = '';
-      (profile.links || []).forEach(link => {
-        const btn = document.createElement('a');
-        btn.href = formatLink(link.platform, link.username);
-        btn.target = '_blank';
-        btn.className = 'social-btn';
-        btn.title = `${link.platform}: ${link.username}`;
+      // ---- Social Links ----
+      const linksDiv = $('socialLinks');
+      linksDiv.innerHTML = '';
+      (profile.links || []).forEach(l => {
+        const a = document.createElement('a');
+        a.href = formatLink(l.platform, l.username);
+        a.target = '_blank';
+        a.className = 'social-btn';
+        a.title = `${l.platform}: ${l.username}`;
         const img = document.createElement('img');
-        img.src = platforms[link.platform] || '';
-        img.alt = link.platform;
-        btn.appendChild(img);
-        linksContainer.appendChild(btn);
+        img.src = platforms[l.platform] || '';
+        img.alt = l.platform;
+        a.appendChild(img);
+        linksDiv.appendChild(a);
       });
 
-      // Music
-      if (profile.mp3) {
-        const audio = $('audioPlayer');
+      // ---- Music ----
+      if (profile.mp3){
+        audio = $('audioPlayer');
         audio.src = profile.mp3;
-        $('musicPlayer').style.display = 'block';
-        // Auto-play (optional, muted to avoid popup blockers)
-        audio.volume = 0.5;
-        audio.play().catch(() => {});
+        $('musicPlayer').style.display = 'flex';
+        // Auto-play (muted to avoid block)
+        audio.muted = true;
+        audio.play().catch(()=>{});
+        setTimeout(()=>{audio.muted=false;},500);
+        // Play/Pause button
+        $('playPauseBtn').addEventListener('click', togglePlayPause);
+        audio.addEventListener('play',()=>$('playPauseBtn').innerHTML=`<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>`);
+        audio.addEventListener('pause',()=>$('playPauseBtn').innerHTML=`<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`);
       }
 
-      // Increment view count
+      // ---- View count ----
       let views = parseInt(localStorage.getItem(`views_${user}`) || '0') + 1;
       localStorage.setItem(`views_${user}`, views);
 
-      // Show profile
+      // ---- Back button (preserves pretty URL) ----
+      $('backBtn').onclick = () => location.href = `/dashboard.html?u=${user}`;
+
+      // ---- Show profile ----
       $('profileCard').style.display = 'block';
     };
   </script>

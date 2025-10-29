@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vault 13 – Signup</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <div class="crosshair" id="crosshair"></div>
+  <div class="stars" id="stars"></div>
+  <div class="grid" id="grid"></div>
+  <div class="scanline" id="scanline"></div>
+
+  <div class="auth-page active" id="signupPage">
+    <div class="logo"></div>
+    <h1>VAULT 13</h1>
+    <div class="owner">Owner @w8.it</div>
+    <form id="signupForm">
+      <div class="input-group"><input type="text" id="signupUser" placeholder="USERNAME" required /></div>
+      <div class="input-group"><input type="password" id="signupPass" placeholder="PASSWORD" required /></div>
+      <div class="input-group"><input type="password" id="signupPass2" placeholder="CONFIRM PASSWORD" required /></div>
+      <button type="submit" class="btn">SIGNUP</button>
+    </form>
+    <div class="links"><a href="login.html">Already have an account?</a></div>
+    <div class="terminal" id="signupTerminal">root@vault13:~$ signup_awaiting_</div>
+  </div>
+
+  <script src="assets/script.js"></script>
+  <script>
+    createStars();
+    $('stars').style.opacity = '1';
+    $('grid').style.opacity = '1';
+    $('scanline').style.opacity = '1';
+    setInterval(updateVisitors, 3000);
+
+    $('signupForm').onsubmit = e => {
+      e.preventDefault();
+      const u = $('signupUser').value.trim().toLowerCase();
+      const p1 = $('signupPass').value, p2 = $('signupPass2').value;
+      if (!u || !p1 || p1 !== p2) return term('signupTerminal','invalid_input_','#f00');
+      if (localStorage.getItem(`profile_${u}`)) return term('signupTerminal','user_exists_','#f00');
+      const profile = {user:u,pass:p1,name:u,bio:'',avatar:'',mp3:'',links:[],bg:'',badge:'',title:'',verified:false};
+      localStorage.setItem(`profile_${u}`, JSON.stringify(profile));
+      term('signupTerminal','account_created_','#8a2be2',true);
+      setTimeout(() => goToDashboard(u), 1200);
+    };
+  </script>
+</body>
+</html>

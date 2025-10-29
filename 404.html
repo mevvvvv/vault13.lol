@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting…</title>
+  <meta http-equiv="refresh" content="0;url=/">
+  <script>
+    // GitHub Pages 404 → rewrite /profile/@user → profile.html?u=user
+    const path = location.pathname;
+    const prettyMatch = path.match(/^/profile/@([^/]+)$/i);
+    if (prettyMatch) {
+      const user = prettyMatch[1];
+      location.replace(/profile.html?u=${user});
+    } else {
+      // Any other 404 → go to home
+      location.replace('/');
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting…</p>
+</body>
+</html>

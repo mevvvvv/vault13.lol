@@ -3,136 +3,277 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vault 13 – Profile</title>
-  <link rel="stylesheet" href="assets/style.css"/>
+  <title>@username – Vault 13</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --bg:#000;--card-bg:rgba(15,15,30,.6);--border:rgba(138,43,226,.3);
+      --glow-inner:inset 0 0 25px rgba(138,43,226,.3);--glow-outer:0 0 35px rgba(138,43,226,.6);
+      --accent:#8a2be2;--accent2:#00d4ff;--text:#e0d9ff;--text-dim:#b19cd9;
+      --transition:all .4s cubic-bezier(.23,1,.32,1)
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      background:#000;color:var(--text);font-family:'Roboto Mono',monospace;
+      min-height:100vh;overflow-x:hidden;cursor:none;
+      background:var(--profile-bg, #000);
+      background-size:cover;background-position:center;
+    }
+    button,a{cursor:none}
+
+    /* Crosshair */
+    .crosshair{
+      position:fixed;width:20px;height:20px;pointer-events:none;z-index:9999;
+      transform:translate(-50%,-50%);
+      background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%238a2be2" d="M9 2h2v16H9z"/><path fill="%238a2be2" d="M2 9h16v2H2z"/></svg>') center/contain no-repeat;
+      filter:drop-shadow(0 0 8px var(--accent2));animation:pulseCross 2s infinite;display:none;
+    }
+    @keyframes pulseCross{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.15)}}
+
+    /* Background Effects */
+    .stars{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .stars::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at 20% 80%,rgba(138,43,226,.15),transparent 50%),
+                 radial-gradient(circle at 80% 20%,rgba(0,212,255,.15),transparent 50%);
+      animation:nebulaPulse 12s infinite;
+    }
+    .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s infinite}
+    @keyframes nebulaPulse{0%,100%{opacity:.7}50%{opacity:1}}
+    @keyframes twinkle{0%,100%{opacity:0;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+    .container{
+      max-width:900px;margin:0 auto;padding:2rem;display:flex;flex-direction:column;align-items:center;
+      position:relative;z-index:10;
+    }
+    .profile-card{
+      background:var(--card-bg);padding:2.5rem;border-radius:20px;
+      border:1px solid var(--border);box-shadow:var(--glow-inner),var(--glow-outer);
+      backdrop-filter:blur(16px);text-align:center;width:100%;max-width:500px;
+      margin-top:3rem;
+    }
+    .avatar{
+      width:140px;height:140px;border-radius:50%;border:3px solid var(--border);
+      box-shadow:var(--glow-inner);margin:0 auto 1.5rem;background:#222 center/cover no-repeat;
+    }
+    .display-name{
+      font:700 1.8rem 'Orbitron',sans-serif;color:var(--text);text-shadow:0 0 20px var(--accent);
+      margin-bottom:.5rem;
+    }
+    .username{
+      font-size:.95rem;color:var(--text-dim);margin-bottom:1rem;
+    }
+    .bio{
+      font-size:1rem;line-height:1.6;color:#ccc;margin:1.2rem 0;
+      padding:0 1rem;
+    }
+    .social-links{
+      display:flex;gap:1rem;justify-content:center;margin:1.5rem 0;flex-wrap:wrap;
+    }
+    .social-btn{
+      width:50px;height:50px;border-radius:50%;background:var(--card-bg);
+      border:1px solid var(--border);box-shadow:var(--glow-inner);display:flex;
+      align-items:center;justify-content:center;transition:var(--transition);
+    }
+    .social-btn:hover{
+      transform:translateY(-4px);box-shadow:var(--glow-inner),var(--glow-outer);
+    }
+    .social-btn img{
+      width:24px;height:24px;filter:brightness(0) invert(1);
+    }
+    .verified-badge{
+      display:inline-block;background:linear-gradient(135deg,#8a2be2,#00d4ff);
+      color:#000;font-size:.7rem;padding:.2rem .6rem;border-radius:6px;
+      font-weight:900;letter-spacing:1px;margin-left:.5rem;
+      box-shadow:0 0 15px rgba(138,43,226,.7);
+    }
+    .back-btn{
+      margin-top:2rem;padding:.8rem 1.8rem;background:var(--card-bg);color:var(--text);
+      border:1px solid var(--border);border-radius:12px;font:700 1rem 'Orbitron',sans-serif;
+      text-transform:uppercase;letter-spacing:2px;transition:var(--transition);
+      box-shadow:var(--glow-inner);backdrop-filter:blur(12px);
+    }
+    .back-btn:hover{
+      transform:translateY(-4px);box-shadow:var(--glow-inner),var(--glow-outer);
+    }
+
+    /* Music Player */
+    .music-player{
+      margin-top:1.5rem;width:100%;max-width:400px;
+      background:var(--card-bg);padding:1rem;border-radius:14px;
+      border:1px solid var(--border);box-shadow:var(--glow-inner);
+      backdrop-filter:blur(12px);text-align:center;
+    }
+    .music-player audio{
+      width:100%;margin-top:.5rem;outline:none;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- BACKGROUND EFFECTS -->
   <div class="crosshair" id="crosshair"></div>
   <div class="stars" id="stars"></div>
-  <div class="grid" id="grid"></div>
-  <div class="scanline" id="scanline"></div>
 
-  <!-- PROFILE PAGE (same markup as original) -->
-  <div class="profile-page" id="profilePage">
-    <div class="profile-bg" id="profileBg"></div>
+  <div class="container">
+    <div class="profile-card" id="profileCard" style="display:none;">
+      <div class="avatar" id="avatar"></div>
+      <div class="display-name" id="displayName"></div>
+      <div class="username" id="username"></div>
+      <div class="bio" id="bio"></div>
 
-    <div class="profile-sidebar" id="profileSidebar">
-      <div class="profile-nav-item" id="backToDashBtn"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
-      <div class="profile-nav-item" id="profileLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
-    </div>
+      <div class="social-links" id="socialLinks"></div>
 
-    <div style="text-align:center;position:relative;z-index:2;">
-      <div class="profile-avatar" id="profileAvatar" style="position:relative;">
-        <div id="verifiedBadge" class="verified-check" style="display:none;"><i class="fas fa-check"></i></div>
+      <div class="music-player" id="musicPlayer" style="display:none;">
+        <div style="color:var(--accent2);font-weight:700;margin-bottom:.5rem;">
+          Now Playing
+        </div>
+        <audio id="audioPlayer" controls></audio>
       </div>
-      <div class="profile-username" id="profileUsername"></div>
-      <div id="adminTitleDisplay" class="admin-title" style="display:none;"></div>
-      <div class="profile-bio" id="profileBio"></div>
+
+      <button class="back-btn" onclick="location.href='dashboard.html?u=' + user">Back to Dashboard</button>
     </div>
 
-    <div class="profile-links" id="profileLinks"></div>
-    <audio id="bgAudio" loop autoplay></audio>
-    <div class="visitor" id="visitorCount">4 visitors in orbit</div>
+    <div id="notFound" style="text-align:center;margin-top:5rem;color:#ff6666;font-size:1.2rem;display:none;">
+      <i class="fas fa-exclamation-triangle" style="font-size:3rem;margin-bottom:1rem;"></i>
+      <div>User not found.</div>
+      <button class="back-btn" style="margin-top:1rem;" onclick="location.href='index.html'">Go Home</button>
+    </div>
   </div>
 
-  <script src="assets/script.js"></script>
   <script>
-    // === DYNAMIC PROFILE LOADER ===
-    const path = location.pathname; // e.g. "/cry"
-    const username = path.slice(1).toLowerCase().trim();
+    const $ = id => document.getElementById(id);
+    let user = null;
 
-    // Redirect root to index
-    if (!username) {
-      location.href = 'index.html';
-      throw new Error('No username');
-    }
+    // Crosshair
+    document.addEventListener('mousemove', e => {
+      const c = $('crosshair');
+      c.style.left = e.clientX + 'px';
+      c.style.top = e.clientY + 'px';
+      c.style.display = 'block';
+    });
 
-    // Check if user exists
-    const profileKey = `profile_${username}`;
-    const profileData = localStorage.getItem(profileKey);
-
-    if (!profileData) {
-      alert(`User @${username} not found.`);
-      location.href = 'index.html';
-      throw new Error('User not found');
-    }
-
-    // === LOAD PROFILE ===
-    const p = JSON.parse(profileData);
-
-    // Set page title
-    document.title = `Vault 13 – @${p.name || username}`;
-
-    // Populate profile
-    $('profileUsername').textContent = p.name || username;
-    $('profileBio').textContent = p.bio || 'No bio yet.';
-    $('profileBg').style.background = p.bg || 'var(--bg)';
-
-    // Avatar
-    setAvatar(p.avatar);
-
-    // Verified badge
-    $('verifiedBadge').style.display = p.verified ? 'flex' : 'none';
-
-    // Admin title (if any)
-    if (p.title) {
-      $('adminTitleDisplay').textContent = p.title;
-      $('adminTitleDisplay').style.display = 'block';
-    }
-
-    // Social links
-    const linksContainer = $('profileLinks');
-    linksContainer.innerHTML = '';
-    p.links.forEach(l => {
-      const plat = l.platform.toLowerCase();
-      if (platforms[plat]) {
-        const a = document.createElement('a');
-        a.href = platforms[plat].format(l.username);
-        a.target = '_blank';
-        a.className = 'profile-link';
-        a.style.backgroundImage = `url(${platforms[plat].icon})`;
-        linksContainer.appendChild(a);
+    // Stars
+    function createStars() {
+      const container = $('stars');
+      for (let i = 0; i < 60; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.width = s.style.height = Math.random() * 2.5 + 1 + 'px';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = Math.random() * 3 + 's';
+        container.appendChild(s);
       }
-    });
-
-    // Background music
-    const audio = $('bgAudio');
-    if (p.mp3) {
-      audio.src = p.mp3;
-      audio.play().catch(() => console.log('Autoplay prevented'));
     }
 
-    // Show sidebar only if you're viewing your own profile
-    const currentUser = new URLSearchParams(location.search).get('u') || localStorage.getItem('currentUser');
-    $('profileSidebar').classList.toggle('active', currentUser === username);
+    // Social Icons
+    const platforms = {
+      discord: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg',
+      twitter: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg',
+      instagram: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg',
+      twitch: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg',
+      github: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg',
+      youtube: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg',
+      tiktok: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg',
+      spotify: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg',
+      steam: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg',
+      reddit: 'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg'
+    };
 
-    // Increment view count
-    let views = parseInt(localStorage.getItem(`views_${username}`) || '0') + 1;
-    localStorage.setItem(`views_${username}`, views);
+    function formatLink(platform, username) {
+      const map = {
+        discord: u => u.includes('discord.gg/') ? u : `https://discord.gg/${u}`,
+        twitter: u => `https://twitter.com/${u}`,
+        instagram: u => `https://instagram.com/${u}`,
+        twitch: u => `https://twitch.tv/${u}`,
+        github: u => `https://github.com/${u}`,
+        youtube: u => `https://youtube.com/@${u}`,
+        tiktok: u => `https://tiktok.com/@${u}`,
+        spotify: u => `https://open.spotify.com/user/${u}`,
+        steam: u => `https://steamcommunity.com/id/${u}`,
+        reddit: u => `https://reddit.com/user/${u}`
+      };
+      return map[platform] ? map[platform](username) : `#`;
+    }
 
-    // Activate page
-    $('profilePage').classList.add('active');
+    window.onload = () => {
+      createStars();
+      $('stars').style.opacity = '1';
 
-    // === BACKGROUND EFFECTS ===
-    createStars();
-    $('stars').style.opacity = '1';
-    $('grid').style.opacity = '1';
-    $('scanline').style.opacity = '1';
-    setInterval(updateVisitors, 3000);
+      const params = new URLSearchParams(location.search);
+      user = params.get('u');
+      if (!user) {
+        $('notFound').style.display = 'block';
+        return;
+      }
 
-    // === SIDEBAR ACTIONS (only if own profile) ===
-    $('backToDashBtn')?.addEventListener('click', () => {
-      location.href = `dashboard.html?u=${username}`;
-    });
+      const profile = JSON.parse(localStorage.getItem(`profile_${user}`));
+      if (!profile) {
+        $('notFound').style.display = 'block';
+        return;
+      }
 
-    $('profileLogoutBtn')?.addEventListener('click', () => {
-      localStorage.removeItem('currentUser');
-      location.href = 'index.html';
-    });
+      // Set page title
+      document.title = `@${user} – Vault 13`;
+
+      // Background
+      if (profile.bg) {
+        document.body.style.background = profile.bg;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+      }
+
+      // Avatar
+      const avatarUrl = profile.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
+      $('avatar').style.backgroundImage = `url(${avatarUrl})`;
+
+      // Name & Username
+      $('displayName').textContent = profile.name || user;
+      if (profile.verified) {
+        $('displayName').innerHTML += ` <span class="verified-badge">VERIFIED</span>`;
+      }
+      $('username').textContent = `@${user}`;
+
+      // Bio
+      $('bio').textContent = profile.bio || 'No bio yet.';
+
+      // Social Links
+      const linksContainer = $('socialLinks');
+      linksContainer.innerHTML = '';
+      (profile.links || []).forEach(link => {
+        const btn = document.createElement('a');
+        btn.href = formatLink(link.platform, link.username);
+        btn.target = '_blank';
+        btn.className = 'social-btn';
+        btn.title = `${link.platform}: ${link.username}`;
+        const img = document.createElement('img');
+        img.src = platforms[link.platform] || '';
+        img.alt = link.platform;
+        btn.appendChild(img);
+        linksContainer.appendChild(btn);
+      });
+
+      // Music
+      if (profile.mp3) {
+        const audio = $('audioPlayer');
+        audio.src = profile.mp3;
+        $('musicPlayer').style.display = 'block';
+        // Auto-play (optional, muted to avoid popup blockers)
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      }
+
+      // Increment view count
+      let views = parseInt(localStorage.getItem(`views_${user}`) || '0') + 1;
+      localStorage.setItem(`views_${user}`, views);
+
+      // Show profile
+      $('profileCard').style.display = 'block';
+    };
   </script>
 </body>
 </html>

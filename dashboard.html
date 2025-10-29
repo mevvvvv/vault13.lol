@@ -15,29 +15,189 @@
   <div class="grid" id="grid"></div>
   <div class="scanline" id="scanline"></div>
 
-  <!-- ==== FULL DASHBOARD MARKUP (same as original) ==== -->
+  <!-- ==== FULL DASHBOARD MARKUP (RESTORED) ==== -->
   <div class="dashboard" id="dashboard">
-    <!-- Paste the ENTIRE <div class="dashboard"> from your original file here -->
-    <!-- Includes sidebar, overview, customize, admin panel -->
+    <div class="sidebar">
+      <div class="site-name">
+        <div class="logo-small" id="sidebarAvatar"></div>
+        <div style="flex:1;">
+          <div id="dashDisplayName">vault13.lol</div>
+          <div style="font-size:.75rem;color:#b19cd9;" id="dashUsername"></div>
+        </div>
+        <span class="admin-badge" id="adminBadge" style="display:none;">FOUNDER</span>
+      </div>
+
+      <div class="nav-item active" data-section="overview"><i class="fas fa-chart-line"></i> Overview</div>
+      <div class="nav-item" data-section="customize"><i class="fas fa-palette"></i> Customize</div>
+      <div class="nav-item admin-only" data-section="admin" style="display:none;"><i class="fas fa-cog"></i> Admin Panel</div>
+
+      <div style="height:1px;background:var(--border);margin:1.5rem 0;"></div>
+      <div class="btn" id="logoutBtn" style="background:var(--text);color:#000;padding:1rem;font-size:.95rem;">Logout</div>
+      <div class="btn" id="viewProfileBtn" style="margin-top:.5rem;padding:1rem;font-size:.95rem;">View Profile</div>
+    </div>
+
+    <div class="main" id="mainContent">
+      <!-- OVERVIEW -->
+      <div class="section" id="overview">
+        <h2 class="section-title">Vault Status</h2>
+        <div class="overview-card">
+          <div class="overview-card-title" id="welcomeTitle"></div>
+          <div class="overview-card-content" id="welcomeText"></div>
+        </div>
+        <div class="vault-status-grid">
+          <div class="status-card">
+            <div class="status-icon"><i class="fas fa-user-astronaut"></i></div>
+            <div class="status-label">OPERATOR</div>
+            <div class="status-value" id="dashUser">…</div>
+          </div>
+          <div class="status-card">
+            <div class="status-icon"><i class="fas fa-globe"></i></div>
+            <div class="status-label">PROFILE URL</div>
+            <div class="status-value">vault13.lol/<span id="urlUser"></span></div>
+          </div>
+          <div class="status-card">
+            <div class="status-icon"><i class="fas fa-eye"></i></div>
+            <div class="status-label">PROFILE VIEWS</div>
+            <div class="status-value" id="profileViews">0</div>
+          </div>
+          <div class="status-card">
+            <div class="status-icon"><i class="fas fa-link"></i></div>
+            <div class="status-label">SOCIAL LINKS</div>
+            <div class="status-value" id="socialCount">0</div>
+          </div>
+          <div class="status-card">
+            <div class="status-icon"><i class="fas fa-music"></i></div>
+            <div class="status-label">MUSIC STATUS</div>
+            <div class="status-value" id="musicStatus">None</div>
+          </div>
+          <div class="status-card">
+            <div class="status-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="status-label">VERIFIED</div>
+            <div class="status-value" id="verifiedStatus">No</div>
+          </div>
+        </div>
+        <div class="overview-card" style="margin-top:1.6rem;">
+          <div class="overview-card-title">System Stats</div>
+          <div class="overview-stats-grid">
+            <div class="status-card">
+              <div class="status-icon"><i class="fas fa-users"></i></div>
+              <div class="status-label">TOTAL USERS</div>
+              <div class="status-value" id="totalUsers">0</div>
+            </div>
+            <div class="status-card">
+              <div class="status-icon"><i class="fas fa-server"></i></div>
+              <div class="status-label">SYSTEM UPTIME</div>
+              <div class="status-value" id="uptime">0s</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMIZE -->
+      <div class="section" id="customize" style="display:none;">
+        <h2 class="section-title">Customize Profile</h2>
+        <div class="customize-group">
+          <div class="group-title">Identity</div>
+          <div class="input-group"><input type="text" id="displayName" placeholder="Display Name" /></div>
+          <div class="input-group"><textarea id="bio" rows="3" placeholder="Bio / Tagline"></textarea></div>
+        </div>
+        <div class="customize-group">
+          <div class="group-title">Media</div>
+          <div style="text-align:center;">
+            <img class="avatar-preview" id="avatarPreview" src="" alt="Avatar">
+            <label for="avatarInput" class="upload-label">Change Avatar</label>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+          </div>
+          <div style="text-align:center;margin-top:1.2rem;">
+            <div class="music-preview" id="musicPreview">No music</div>
+            <label for="musicInput" class="upload-label">Upload MP3</label>
+            <input type="file" id="musicInput" accept="audio/mp3" style="display:none;">
+          </div>
+        </div>
+        <div class="customize-group">
+          <div class="group-title">Social Links</div>
+          <div id="socialLinks"></div>
+          <button type="button" class="btn" id="addSocial" style="margin-top:.6rem;width:auto;padding:.6rem 1.2rem;font-size:.9rem;">+ Add Link</button>
+        </div>
+        <div class="customize-group">
+          <div class="group-title">Profile Background</div>
+          <div class="input-group"><textarea id="customBg" rows="2" placeholder="CSS background (e.g. linear-gradient(...))"></textarea></div>
+        </div>
+        <button type="button" class="btn" id="saveCustomize">Save Changes</button>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div class="section" id="admin" style="display:none;">
+        <h2 class="section-title">Admin Panel</h2>
+        <div class="customize-group">
+          <div class="group-title">System Controls</div>
+          <div class="admin-controls">
+            <button class="btn admin-btn" id="clearAllBtn">Clear All Data</button>
+            <button class="btn admin-btn" id="exportBtn">Export All Profiles</button>
+            <button class="btn admin-btn" id="resetViewsBtn">Reset All Views</button>
+            <button class="btn admin-btn" id="forceLogoutBtn">Force Logout All</button>
+          </div>
+        </div>
+        <div class="customize-group">
+          <div class="group-title">User Management</div>
+          <div>Total Users: <span id="totalUsersAdmin">0</span></div>
+          <div class="user-list" id="userList"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="assets/script.js"></script>
   <script>
-    createStars();
-    $('stars').style.opacity = '1';
-    $('grid').style.opacity = '1';
-    $('scanline').style.opacity = '1';
-    setInterval(updateVisitors, 3000);
-    setInterval(updateUptime, 1000);
+    // Helper
+    const $ = id => document.getElementById(id);
 
-    const params = new URLSearchParams(location.search);
-    const u = params.get('u');
-    if (!u || !localStorage.getItem(`profile_${u}`)) {
-      alert('Access denied.');
-      location.href = 'login.html';
-    } else {
-      goDash(u);
+    // Background effects
+    function createStars() {
+      for (let i = 0; i < 80; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.width = s.style.height = Math.random() * 3 + 1 + 'px';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = Math.random() * 3 + 's';
+        $('stars').appendChild(s);
+      }
     }
+
+    // Uptime & visitors
+    let startTime = Date.now();
+    function updateUptime() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const h = Math.floor(elapsed / 3600);
+      const m = Math.floor((elapsed % 3600) / 60);
+      const s = elapsed % 60;
+      $('uptime').textContent = `${h}h ${m}m ${s}s`;
+    }
+
+    function updateVisitors() {
+      const count = Math.floor(Math.random() * 6) + 2;
+      if ($('visitorCount')) $('visitorCount').textContent = `${count} visitors in orbit`;
+    }
+
+    // On load
+    window.onload = () => {
+      createStars();
+      $('stars').style.opacity = '1';
+      $('grid').style.opacity = '1';
+      $('scanline').style.opacity = '1';
+      setInterval(updateVisitors, 3000);
+      setInterval(updateUptime, 1000);
+
+      const params = new URLSearchParams(location.search);
+      const u = params.get('u');
+      if (!u || !localStorage.getItem(`profile_${u}`)) {
+        alert('Access denied.');
+        location.href = 'login.html';
+      } else {
+        goDash(u);
+      }
+    };
   </script>
 </body>
 </html>

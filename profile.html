@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">@user – Vault 13</title>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap"
         rel="stylesheet">
   <link rel="stylesheet"
@@ -162,6 +166,21 @@
   <div id="audioUnlock">Click anywhere to enable music</div>
 
   <script>
+    // === REPLACE WITH YOUR FIREBASE CONFIG ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2PXUqXm3AM3AE8mCimoySbxyrDxNeoIc",
+      authDomain: "vault13profiles.firebaseapp.com",
+      projectId: "vault13profiles",
+      storageBucket: "vault13profiles.firebasestorage.app",
+      messagingSenderId: "244693611399",
+      appId: "1:244693611399:web:6bea27bd0bf6e9c3e9d922",
+      measurementId: "G-78E6C9PPCE"
+    };
+    // === GO TO: Firebase Console → Project Settings → Web App → Copy config ===
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     document.addEventListener('DOMContentLoaded', () => {
       const $ = id => document.getElementById(id);
 
@@ -170,176 +189,174 @@
       const pathMatch = location.pathname.match(/\/(@[^\/\.]+|[^\/\.]+)$/i);
       if (pathMatch) {
         const match = pathMatch[1];
-        if (!match.includes('.')) { // skip .html, .js, etc.
+        if (!match.includes('.')) {
           username = match.replace(/^@/, '').toLowerCase();
         }
       }
-
-      // Fallback to query param: ?u=john
       if (!username) {
         const params = new URLSearchParams(location.search);
         username = params.get('u')?.toLowerCase();
       }
-
       if (!username) {
-        document.body.innerHTML = `<h1 style="color:var(--accent2);text-align:center;margin-top:6rem;">User not found.</h1>`;
+        $('displayName').textContent = 'User not found';
+        $('bio').textContent = 'No username provided.';
         return;
       }
 
       $('pageTitle').textContent = `@${username} – Vault 13`;
-
-      const profileKey = `profile_${username}`;
-      const profile = JSON.parse(localStorage.getItem(profileKey)) || {};
-
-      // === ALWAYS COUNT VIEWS ===
-      const viewsKey = `views_${username}`;
-      let views = parseInt(localStorage.getItem(viewsKey) || '0') + 1;
-      localStorage.setItem(viewsKey, views);
-
-      // === TRACK VIEWER (if logged in) ===
-      const viewer = localStorage.getItem('loggedIn');
-      if (viewer && viewer !== username) {
-        const viewersKey = `viewers_${username}`;
-        let viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
-        const timestamp = new Date().toISOString().split('T')[0];
-        const existing = viewers.find(v => v.user === viewer);
-        if (existing) existing.date = timestamp;
-        else viewers.push({ user: viewer, date: timestamp });
-        viewers = viewers.slice(-20);
-        localStorage.setItem(viewersKey, JSON.stringify(viewers));
-      }
-
-      // === LOAD PROFILE ===
       $('username').textContent = `@${username}`;
 
-      const displayNameEl = $('displayName');
-      const displayName = profile.name || (username === 'profile' ? 'User' : username);
-      const verifiedBadge = profile.verified 
-        ? ' <i class="fas fa-check-circle verified-badge" title="Verified by Vault 13"></i>' 
-        : '';
-      displayNameEl.innerHTML = displayName + verifiedBadge;
+      // === LOAD PROFILE FROM FIRESTORE ===
+      db.collection('profiles').doc(username).get().then((doc) => {
+        let profile = {};
 
-      $('bio').textContent = profile.bio || 'No bio yet.';
-
-      const avatarUrl = profile.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
-      $('avatar').style.backgroundImage = `url(${avatarUrl})`;
-
-      // === BACKGROUND (use `bg`, not `bgImage`) ===
-      if (profile.bg) {
-        const bg = $('profileBg');
-        bg.style.backgroundImage = `url(${profile.bg})`;
-        bg.classList.add('active');
-      }
-
-      // === SOCIAL LINKS ===
-      const socialContainer = $('socialLinks');
-      const platforms = {
-        discord: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg', format:u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`},
-        twitter: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg', format:u=>`https://twitter.com/${u}`},
-        instagram:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg', format:u=>`https://instagram.com/${u}`},
-        twitch:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg', format:u=>`https://twitch.tv/${u}`},
-        github:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg', format:u=>`https://github.com/${u}`},
-        youtube:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg', format:u=>`https://youtube.com/@${u}`},
-        tiktok:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg', format:u=>`https://tiktok.com/@${u}`},
-        spotify:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg', format:u=>`https://open.spotify.com/user/${u}`},
-        steam:    {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg', format:u=>`https://steamcommunity.com/id/${u}`},
-        reddit:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg', format:u=>`https://reddit.com/user/${u}`}
-      };
-
-      (profile.links || []).forEach(link => {
-        const p = platforms[link.platform];
-        if (!p) return;
-        const a = document.createElement('a');
-        a.href = p.format(link.username);
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'social-btn';
-        a.title = link.platform;
-        a.innerHTML = `<img src="${p.icon}" alt="${link.platform}">`;
-        socialContainer.appendChild(a);
-      });
-
-      // === MUSIC AUTO-PLAY WITH UNLOCK ===
-      let audioUnlocked = false;
-      const audio = $('bgAudio');
-      audio.loop = true;
-      audio.volume = 0.6;
-      const unlockPrompt = $('audioUnlock');
-
-      if (profile.mp3) {
-        audio.src = profile.mp3;
-
-        const tryPlay = () => {
-          audio.play().then(() => {
-            audioUnlocked = true;
-            unlockPrompt.classList.remove('show');
-          }).catch(() => {
-            unlockPrompt.classList.add('show');
-          });
-        };
-
-        const unlockAudio = () => {
-          if (audioUnlocked) return;
-          audio.play().then(() => {
-            audioUnlocked = true;
-            unlockPrompt.classList.remove('show');
-          });
-          document.body.removeEventListener('click', unlockAudio);
-          document.body.removeEventListener('touchstart', unlockAudio);
-          document.body.removeEventListener('keydown', unlockAudio);
-        };
-
-        window.addEventListener('load', tryPlay);
-        document.body.addEventListener('click', unlockAudio);
-        document.body.addEventListener('touchstart', unlockAudio);
-        document.body.addEventListener('keydown', unlockAudio);
-      }
-
-      // === VIEWERS BOX (only for owner) ===
-      const loggedInUser = localStorage.getItem('loggedIn');
-      if (loggedInUser && loggedInUser === username) {
-        const viewersKey = `viewers_${username}`;
-        const viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
-        const list = $('viewerList');
-        const box = $('viewerBox');
-
-        if (viewers.length > 0) {
-          list.innerHTML = viewers.reverse().slice(0, 20).map(v =>
-            `<div class="viewer-item"><strong>@${v.user}</strong><span>${v.date}</span></div>`
-          ).join('');
+        if (doc.exists) {
+          profile = doc.data();
         } else {
-          list.innerHTML = '<em style="opacity:.6;">No visitors yet.</em>';
+          // Fallback to localStorage (for testing/offline)
+          const local = localStorage.getItem(`profile_${username}`);
+          if (local) profile = JSON.parse(local);
         }
-        box.style.display = 'block';
-      }
 
-      // === HOME BUTTON (fixed base path) ===
-      const pathParts = location.pathname.split('/').filter(p => p);
-      pathParts.pop(); // remove profile or username
-      const base = location.origin + '/' + pathParts.join('/') + '/';
-      $('homeBtn').href = loggedInUser
-        ? `${base}dashboard.html?u=${loggedInUser}`
-        : `${base}dashboard.html`;
-
-      // === STARS ===
-      function createStars() {
-        const c = $('stars');
-        for (let i = 0; i < 70; i++) {
-          const s = document.createElement('div');
-          s.className = 'star';
-          s.style.width = s.style.height = Math.random() * 2.5 + 1 + 'px';
-          s.style.left = Math.random() * 100 + '%';
-          s.style.top = Math.random() * 100 + '%';
-          s.style.animationDelay = Math.random() * 3 + 's';
-          c.appendChild(s);
+        if (!profile.name && !profile.avatar && !profile.bio && !profile.links) {
+          $('displayName').textContent = 'User not found';
+          $('bio').textContent = 'This user has no public profile.';
+          return;
         }
-      }
-      createStars();
 
-      // === SECURITY ===
-      document.addEventListener('contextmenu', e => e.preventDefault());
-      document.addEventListener('selectstart', e => e.preventDefault());
-      document.addEventListener('dragstart', e => e.preventDefault());
+        // === DISPLAY PROFILE ===
+        const displayName = profile.name || username;
+        const verifiedBadge = profile.verified 
+          ? ' <i class="fas fa-check-circle verified-badge" title="Verified by Vault 13"></i>' 
+          : '';
+        $('displayName').innerHTML = displayName + verifiedBadge;
+        $('bio').textContent = profile.bio || 'No bio yet.';
+
+        const defaultAvatar = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
+        $('avatar').style.backgroundImage = `url(${profile.avatar || defaultAvatar})`;
+
+        if (profile.bg) {
+          const bg = $('profileBg');
+          bg.style.backgroundImage = `url(${profile.bg})`;
+          bg.classList.add('active');
+        }
+
+        // === SOCIAL LINKS ===
+        const socialContainer = $('socialLinks');
+        socialContainer.innerHTML = '';
+        const platforms = {
+          discord: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg', format:u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`},
+          twitter: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg', format:u=>`https://twitter.com/${u}`},
+          instagram:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg', format:u=>`https://instagram.com/${u}`},
+          twitch:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg', format:u=>`https://twitch.tv/${u}`},
+          github:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg', format:u=>`https://github.com/${u}`},
+          youtube:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg', format:u=>`https://youtube.com/@${u}`},
+          tiktok:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg', format:u=>`https://tiktok.com/@${u}`},
+          spotify:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg', format:u=>`https://open.spotify.com/user/${u}`},
+          steam:    {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg', format:u=>`https://steamcommunity.com/id/${u}`},
+          reddit:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg', format:u=>`https://reddit.com/user/${u}`}
+        };
+
+        (profile.links || []).forEach(link => {
+          const p = platforms[link.platform];
+          if (!p) return;
+          const a = document.createElement('a');
+          a.href = p.format(link.username);
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'social-btn';
+          a.title = link.platform;
+          a.innerHTML = `<img src="${p.icon}" alt="${link.platform}">`;
+          socialContainer.appendChild(a);
+        });
+
+        // === MUSIC ===
+        let audioUnlocked = false;
+        const audio = $('bgAudio');
+        audio.loop = true;
+        audio.volume = 0.6;
+        const unlockPrompt = $('audioUnlock');
+
+        if (profile.mp3) {
+          audio.src = profile.mp3;
+
+          const tryPlay = () => {
+            audio.play().then(() => {
+              audioUnlocked = true;
+              unlockPrompt.classList.remove('show');
+            }).catch(() => {
+              unlockPrompt.classList.add('show');
+            });
+          };
+
+          const unlockAudio = () => {
+            if (audioUnlocked) return;
+            audio.play().then(() => {
+              audioUnlocked = true;
+              unlockPrompt.classList.remove('show');
+            });
+            document.body.removeEventListener('click', unlockAudio);
+            document.body.removeEventListener('touchstart', unlockAudio);
+            document.body.removeEventListener('keydown', unlockAudio);
+          };
+
+          window.addEventListener('load', tryPlay);
+          document.body.addEventListener('click', unlockAudio);
+          document.body.addEventListener('touchstart', unlockAudio);
+          document.body.addEventListener('keydown', unlockAudio);
+        }
+
+        // === VIEWERS BOX (only for owner) ===
+        const loggedInUser = localStorage.getItem('loggedIn');
+        if (loggedInUser && loggedInUser === username) {
+          const viewersKey = `viewers_${username}`;
+          const viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
+          const list = $('viewerList');
+          const box = $('viewerBox');
+
+          if (viewers.length > 0) {
+            list.innerHTML = viewers.reverse().slice(0, 20).map(v =>
+              `<div class="viewer-item"><strong>@${v.user}</strong><span>${v.date}</span></div>`
+            ).join('');
+          } else {
+            list.innerHTML = '<em style="opacity:.6;">No visitors yet.</em>';
+          }
+          box.style.display = 'block';
+        }
+
+        // === HOME BUTTON ===
+        const pathParts = location.pathname.split('/').filter(p => p);
+        pathParts.pop();
+        const base = location.origin + '/' + pathParts.join('/') + '/';
+        $('homeBtn').href = loggedInUser
+          ? `${base}dashboard.html?u=${loggedInUser}`
+          : `${base}dashboard.html`;
+
+        // === STARS ===
+        function createStars() {
+          const c = $('stars');
+          for (let i = 0; i < 70; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            s.style.width = s.style.height = Math.random() * 2.5 + 1 + 'px';
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.animationDelay = Math.random() * 3 + 's';
+            c.appendChild(s);
+          }
+        }
+        createStars();
+
+        // === SECURITY ===
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+      }).catch((error) => {
+        console.error('Firestore error:', error);
+        $('displayName').textContent = 'Error loading profile';
+        $('bio').textContent = 'Check internet or try again.';
+      });
     });
   </script>
 </body>

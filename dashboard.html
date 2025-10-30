@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vault 13 – Dashboard</title>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap"
         rel="stylesheet">
   <link rel="stylesheet"
@@ -301,6 +305,19 @@
   </div>
 
   <script>
+    // === FIREBASE CONFIG — REPLACE WITH YOURS ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2PXUqXm3AM3AE8mCimoySbxyrDxNeoIc",
+      authDomain: "vault13profiles.firebaseapp.com",
+      projectId: "vault13profiles",
+      storageBucket: "vault13profiles.firebasestorage.app",
+      messagingSenderId: "244693611399",
+      appId: "1:244693611399:web:6bea27bd0bf6e9c3e9d922",
+      measurementId: "G-78E6C9PPCE"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const platforms = {
       discord: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg',
                 format:u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`},
@@ -351,154 +368,173 @@
       c.style.left=e.clientX+'px'; c.style.top=e.clientY+'px'; c.style.display='block';
     });
 
-    function goDash(u){
-      user=u;
-      const p=JSON.parse(localStorage.getItem(`profile_${u}`))||{};
+    async function goDash(u){
+      user = u;
+      isAdmin = u === 'xen';
+      $('adminBadge').style.display = isAdmin ? 'inline' : 'none';
+      document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
 
-      isAdmin = u==='xen';
-      $('adminBadge').style.display=isAdmin?'inline':'none';
-      document.querySelectorAll('.admin-only').forEach(el=>el.style.display=isAdmin?'block':'none');
+      // Load from Firestore
+      const doc = await db.collection('profiles').doc(u).get();
+      let p = doc.exists ? doc.data() : {};
 
-      $('dashUser').textContent=u;
-      $('dashDisplayName').textContent=p.name||u;
-      $('dashUsername').textContent=`@${u}`;
-      $('urlUser').textContent=`@${u}`;
+      // Fallback to localStorage
+      if (!p.name) {
+        const local = localStorage.getItem(`profile_${u}`);
+        if (local) p = JSON.parse(local);
+      }
 
-      let v=parseInt(localStorage.getItem(`views_${u}`)||'0')+1;
-      localStorage.setItem(`views_${u}`,v);
-      animateValue('profileViews',0,v,800);
+      // Update UI
+      $('dashUser').textContent = u;
+      $('dashDisplayName').textContent = p.name || u;
+      $('dashUsername').textContent = `@${u}`;
+      $('urlUser').textContent = `@${u}`;
 
-      $('socialCount').textContent=(p.links||[]).length;
-      $('musicStatus').textContent=p.mp3?'Active':'None';
-      $('bgStatus').textContent=p.bgImage?'Active':'None';
-      $('verifiedStatus').textContent=p.verified?'Yes':'No';
-      $('totalUsers').textContent=Object.keys(localStorage).filter(k=>k.startsWith('profile_')).length;
+      let v = parseInt(localStorage.getItem(`views_${u}`) || '0') + 1;
+      localStorage.setItem(`views_${u}`, v);
+      animateValue('profileViews', 0, v, 800);
 
-      if(isAdmin){
-        $('welcomeTitle').innerHTML=`Hello, ${p.name||u} <span class="admin-badge">FOUNDER</span>`;
-        $('welcomeText').textContent='As a Founder, you oversee the Vault 13 platform...';
-      }else{
-        $('welcomeTitle').textContent=`Welcome, ${p.name||u}`;
-        $('welcomeText').textContent='Vault 13 is your social sharing platform...';
+      $('socialCount').textContent = (p.links || []).length;
+      $('musicStatus').textContent = p.mp3 ? 'Active' : 'None';
+      $('bgStatus').textContent = p.bg ? 'Active' : 'None';
+      $('verifiedStatus').textContent = p.verified ? 'Yes' : 'No';
+
+      if (isAdmin) {
+        $('welcomeTitle').innerHTML = `Hello, ${p.name || u} <span class="admin-badge">FOUNDER</span>`;
+        $('welcomeText').textContent = 'As a Founder, you oversee the Vault 13 platform...';
+      } else {
+        $('welcomeTitle').textContent = `Welcome, ${p.name || u}`;
+        $('welcomeText').textContent = 'Vault 13 is your social sharing platform...';
       }
 
       setAvatar(p.avatar);
-      $('displayName').value=p.name||u;
-      $('bio').value=p.bio||'';
-      loadLinks(p.links||[]);
-      if(isAdmin) loadAdminPanel();
+      $('displayName').value = p.name || u;
+      $('bio').value = p.bio || '';
+      loadLinks(p.links || []);
+      if (isAdmin) loadAdminPanel();
 
       $('dashboard').classList.add('active');
     }
 
-    function animateValue(id,start,end,dur){
-      let t=null; const el=$(id);
-      function step(now){ if(!t) t=now;
-        const p=Math.min((now-t)/dur,1);
-        el.textContent=Math.floor(p*(end-start)+start);
-        if(p<1) requestAnimationFrame(step);
+    function animateValue(id, start, end, dur){
+      let t = null; const el = $(id);
+      function step(now){
+        if (!t) t = now;
+        const p = Math.min((now - t) / dur, 1);
+        el.textContent = Math.floor(p * (end - start) + start);
+        if (p < 1) requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
     }
 
     function setAvatar(src){
-      const url=src||'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
-      $('avatarPreview').src=url;
-      $('sidebarAvatar').style.backgroundImage=`url(${url})`;
+      const url = src || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
+      $('avatarPreview').src = url;
+      $('sidebarAvatar').style.backgroundImage = `url(${url})`;
     }
 
     function loadLinks(arr){
-      const c=$('socialLinks'); c.innerHTML='';
-      arr.forEach(l=>addLinkInput(l.platform,l.username));
-      if(!arr.length) addLinkInput();
+      const c = $('socialLinks'); c.innerHTML = '';
+      arr.forEach(l => addLinkInput(l.platform, l.username));
+      if (!arr.length) addLinkInput();
     }
-    function addLinkInput(p='',u=''){
-      const d=document.createElement('div'); d.className='social-input';
-      const opts=Object.keys(platforms).map(k=>`<option value="${k}" ${k===p?'selected':''}>${k}</option>`).join('');
-      d.innerHTML=`<select>${opts}</select><input type="text" placeholder="username or invite" value="${u}"><button type="button">x</button>`;
-      d.querySelector('button').onclick=()=>d.remove();
+    function addLinkInput(p = '', u = ''){
+      const d = document.createElement('div'); d.className = 'social-input';
+      const opts = Object.keys(platforms).map(k => `<option value="${k}" ${k===p?'selected':''}>${k}</option>`).join('');
+      d.innerHTML = `<select>${opts}</select><input type="text" placeholder="username or invite" value="${u}"><button type="button">x</button>`;
+      d.querySelector('button').onclick = () => d.remove();
       $('socialLinks').appendChild(d);
     }
-    $('addSocial').onclick=()=>addLinkInput();
+    $('addSocial').onclick = () => addLinkInput();
 
-    $('saveCustomize').onclick=()=>{
-      const p=JSON.parse(localStorage.getItem(`profile_${user}`))||{};
-      p.name=$('displayName').value.trim()||user;
-      p.bio=$('bio').value.trim();
-      p.links=[];
-      document.querySelectorAll('#socialLinks .social-input').forEach(d=>{
-        const plat=d.children[0].value.trim(), name=d.children[1].value.trim();
-        if(plat&&name) p.links.push({platform:plat,username:name});
+    $('saveCustomize').onclick = async () => {
+      const p = {
+        name: $('displayName').value.trim() || user,
+        bio: $('bio').value.trim(),
+        avatar: $('avatarPreview').src,
+        mp3: $('musicStatus').textContent === 'Active' ? $('musicInput').dataset.b64 : null,
+        bg: $('bgStatus').textContent === 'Active' ? $('bgInput').dataset.b64 : null,
+        links: [],
+        verified: user === 'xen' ? true : false
+      };
+
+      document.querySelectorAll('#socialLinks .social-input').forEach(d => {
+        const plat = d.children[0].value.trim(), name = d.children[1].value.trim();
+        if (plat && name) p.links.push({platform: plat, username: name});
       });
-      localStorage.setItem(`profile_${user}`,JSON.stringify(p));
-      alert('Saved!');
+
+      try {
+        await db.collection('profiles').doc(user).set(p);
+        localStorage.setItem(`profile_${user}`, JSON.stringify(p));
+        alert('Saved to cloud!');
+      } catch (e) {
+        console.error(e);
+        alert('Cloud save failed. Saved locally.');
+        localStorage.setItem(`profile_${user}`, JSON.stringify(p));
+      }
       goDash(user);
     };
 
-    $('avatarInput').onchange=e=>{
-      const f=e.target.files[0]; if(!f) return;
-      const r=new FileReader(); r.onload=ev=>{
-        const b64=ev.target.result;
+    $('avatarInput').onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader(); r.onload = ev => {
+        const b64 = ev.target.result;
         setAvatar(b64);
-        const p=JSON.parse(localStorage.getItem(`profile_${user}`))||{};
-        p.avatar=b64; localStorage.setItem(`profile_${user}`,JSON.stringify(p));
       };
       r.readAsDataURL(f);
     };
 
-    $('musicInput').onchange=e=>{
-      const f=e.target.files[0]; if(!f) return;
-      const r=new FileReader(); r.onload=ev=>{
-        const b64=ev.target.result;
-        const p=JSON.parse(localStorage.getItem(`profile_${user}`))||{};
-        p.mp3=b64; localStorage.setItem(`profile_${user}`,JSON.stringify(p));
-        $('musicStatus').textContent='Active';
-        alert('MP3 uploaded! Auto-plays on profile.');
+    $('musicInput').onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader(); r.onload = ev => {
+        e.target.dataset.b64 = ev.target.result;
+        $('musicStatus').textContent = 'Active';
+        alert('MP3 uploaded!');
       };
       r.readAsDataURL(f);
     };
 
-    $('bgInput').onchange=e=>{
-      const f=e.target.files[0]; if(!f) return;
-      const r=new FileReader(); r.onload=ev=>{
-        const b64=ev.target.result;
-        const p=JSON.parse(localStorage.getItem(`profile_${user}`))||{};
-        p.bgImage=b64; localStorage.setItem(`profile_${user}`,JSON.stringify(p));
-        $('bgStatus').textContent='Active';
-        alert('Background uploaded! Visible on profile.');
+    $('bgInput').onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader(); r.onload = ev => {
+        e.target.dataset.b64 = ev.target.result;
+        $('bgStatus').textContent = 'Active';
+        alert('Background uploaded!');
       };
       r.readAsDataURL(f);
     };
 
-    document.querySelectorAll('.nav-item[data-section]').forEach(n=>{
-      n.onclick=()=>{
-        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    document.querySelectorAll('.nav-item[data-section]').forEach(n => {
+      n.onclick = () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         n.classList.add('active');
-        document.querySelectorAll('.section').forEach(s=>s.style.display='none');
-        $(n.dataset.section).style.display='block';
-        if(n.dataset.section==='admin') loadAdminPanel();
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        $(n.dataset.section).style.display = 'block';
+        if (n.dataset.section === 'admin') loadAdminPanel();
       };
     });
 
-    $('logoutBtn').onclick=()=>{
+    $('logoutBtn').onclick = () => {
       localStorage.removeItem('loggedIn');
       $('dashboard').classList.remove('active');
-      setTimeout(()=>location.href='index.html',800);
+      setTimeout(() => location.href = 'index.html', 800);
     };
 
-    $('viewProfileBtn').onclick=()=>{
+    $('viewProfileBtn').onclick = () => {
       const base = location.origin + location.pathname.replace(/[^/]*$/, '');
       window.open(`${base}profile.html?u=${user}`, '_blank');
     };
 
-    function loadAdminPanel(){
-      const users=Object.keys(localStorage).filter(k=>k.startsWith('profile_')).map(k=>k.replace('profile_',''));
-      $('totalUsersAdmin').textContent=users.length;
-      const list=$('userList'); list.innerHTML='';
-      users.forEach(u=>{
-        const p=JSON.parse(localStorage.getItem(`profile_${u}`))||{};
-        const div=document.createElement('div'); div.className='user-item';
-        div.innerHTML=`
+    async function loadAdminPanel(){
+      const snap = await db.collection('profiles').get();
+      const users = snap.docs.map(d => d.id);
+      $('totalUsersAdmin').textContent = users.length;
+      const list = $('userList'); list.innerHTML = '';
+      for (const u of users) {
+        const doc = await db.collection('profiles').doc(u).get();
+        const p = doc.data() || {};
+        const div = document.createElement('div'); div.className = 'user-item';
+        div.innerHTML = `
           <span>@${u}</span>
           <div style="display:flex;gap:.5rem;align-items:center;">
             <label class="verify-toggle">
@@ -509,52 +545,56 @@
             <button onclick="deleteUser('${u}')">Delete</button>
           </div>`;
         list.appendChild(div);
-      });
+      }
     }
-    window.toggleVerify=(u,c)=>{ 
-      const p=JSON.parse(localStorage.getItem(`profile_${u}`))||{}; 
-      p.verified=c;
-      localStorage.setItem(`profile_${u}`,JSON.stringify(p));
-      if(u===user) $('verifiedStatus').textContent=c?'Yes':'No';
+
+    window.toggleVerify = async (u, c) => {
+      await db.collection('profiles').doc(u).update({ verified: c });
+      if (u === user) $('verifiedStatus').textContent = c ? 'Yes' : 'No';
     };
-    window.deleteUser=u=>{ 
-      if(confirm(`Delete @${u}?`)){
-        localStorage.removeItem(`profile_${u}`); 
+
+    window.deleteUser = async u => {
+      if (confirm(`Delete @${u}?`)) {
+        await db.collection('profiles').doc(u).delete();
+        localStorage.removeItem(`profile_${u}`);
         localStorage.removeItem(`views_${u}`);
-        loadAdminPanel(); 
-        if(u===user) $('logoutBtn').click();
+        loadAdminPanel();
+        if (u === user) $('logoutBtn').click();
       }
     };
 
-    $('clearAllBtn').onclick=()=>{ if(confirm('ERASE ALL DATA?')){localStorage.clear();location.reload();} };
-    $('exportBtn').onclick=()=>{
-      const data=JSON.stringify(localStorage);
-      const blob=new Blob([data],{type:'application/json'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-      a.download='vault13_backup.json'; a.click();
+    $('clearAllBtn').onclick = () => { if (confirm('ERASE ALL DATA?')) { db.collection('profiles').get().then(s => s.docs.forEach(d => d.ref.delete())); location.reload(); } };
+    $('exportBtn').onclick = async () => {
+      const snap = await db.collection('profiles').get();
+      const data = {};
+      snap.docs.forEach(d => data[d.id] = d.data());
+      const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'vault13_backup.json'; a.click();
     };
-    $('resetViewsBtn').onclick=()=>{
-      Object.keys(localStorage).filter(k=>k.startsWith('views_')).forEach(k=>localStorage.removeItem(k));
+    $('resetViewsBtn').onclick = () => {
+      Object.keys(localStorage).filter(k => k.startsWith('views_')).forEach(k => localStorage.removeItem(k));
       alert('All views reset!');
     };
-    $('forceLogoutBtn').onclick=()=>alert('Not implemented in localStorage mode.');
+    $('forceLogoutBtn').onclick = () => alert('Not implemented.');
 
-    window.onload=()=>{
+    window.onload = async () => {
       createStars();
-      $('stars').style.opacity='1'; $('grid').style.opacity='1'; $('scanline').style.opacity='1';
-      setInterval(updateUptime,1000);
+      $('stars').style.opacity = '1'; $('grid').style.opacity = '1'; $('scanline').style.opacity = '1';
+      setInterval(updateUptime, 1000);
 
       const savedUser = localStorage.getItem('loggedIn');
       const urlUser = new URLSearchParams(location.search).get('u');
       const finalUser = urlUser || savedUser;
 
-      if(!finalUser || !localStorage.getItem(`profile_${finalUser}`)){
+      if (!finalUser) {
         alert('Access denied.');
-        location.href='index.html';
-      } else {
-        localStorage.setItem('loggedIn', finalUser);
-        goDash(finalUser);
+        location.href = 'index.html';
+        return;
       }
+
+      localStorage.setItem('loggedIn', finalUser);
+      await goDash(finalUser);
     };
   </script>
 </body>

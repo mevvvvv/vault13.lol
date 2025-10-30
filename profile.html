@@ -116,7 +116,6 @@
     }
     #audioUnlock.show{opacity:1;visibility:visible;}
 
-    /* VERIFIED BADGE — SMALLER & CLEAN */
     .verified-badge{
       color:#1DA1F2;
       font-size:0.95em;
@@ -163,170 +162,185 @@
   <div id="audioUnlock">Click anywhere to enable music</div>
 
   <script>
-    const $ = id => document.getElementById(id);
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = id => document.getElementById(id);
 
-    let username = null;
-    const pathMatch = location.pathname.match(/@([^\/]+)$/i);
-    if (pathMatch) username = pathMatch[1].toLowerCase();
-    if (!username) {
-      const params = new URLSearchParams(location.search);
-      username = params.get('u')?.toLowerCase();
-    }
-    if (!username) {
-      document.body.innerHTML = `<h1 style="color:var(--accent2);text-align:center;margin-top:6rem;">User not found.</h1>`;
-      throw '';
-    }
+      // === GET USERNAME FROM URL ===
+      let username = null;
+      const pathMatch = location.pathname.match(/\/(@[^\/\.]+|[^\/\.]+)$/i);
+      if (pathMatch) {
+        const match = pathMatch[1];
+        if (!match.includes('.')) { // skip .html, .js, etc.
+          username = match.replace(/^@/, '').toLowerCase();
+        }
+      }
 
-    document.getElementById('pageTitle').textContent = `@${username} – Vault 13`;
+      // Fallback to query param: ?u=john
+      if (!username) {
+        const params = new URLSearchParams(location.search);
+        username = params.get('u')?.toLowerCase();
+      }
 
-    const profileKey = `profile_${username}`;
-    const profile = JSON.parse(localStorage.getItem(profileKey)) || {};
+      if (!username) {
+        document.body.innerHTML = `<h1 style="color:var(--accent2);text-align:center;margin-top:6rem;">User not found.</h1>`;
+        return;
+      }
 
-    const viewer = localStorage.getItem('loggedIn');
-    if (viewer && viewer !== username) {
-      const viewersKey = `viewers_${username}`;
-      let viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
-      const timestamp = new Date().toISOString().split('T')[0];
-      const existing = viewers.find(v => v.user === viewer);
-      if (existing) existing.date = timestamp;
-      else viewers.push({ user: viewer, date: timestamp });
-      viewers = viewers.slice(-20);
-      localStorage.setItem(viewersKey, JSON.stringify(viewers));
-    }
+      $('pageTitle').textContent = `@${username} – Vault 13`;
 
-    const viewsKey = `views_${username}`;
-    let views = parseInt(localStorage.getItem(viewsKey) || '0') + 1;
-    localStorage.setItem(viewsKey, views);
+      const profileKey = `profile_${username}`;
+      const profile = JSON.parse(localStorage.getItem(profileKey)) || {};
 
-    $('username').textContent = `@${username}`;
+      // === ALWAYS COUNT VIEWS ===
+      const viewsKey = `views_${username}`;
+      let views = parseInt(localStorage.getItem(viewsKey) || '0') + 1;
+      localStorage.setItem(viewsKey, views);
 
-    // VERIFIED BADGE
-    const displayNameEl = $('displayName');
-    const displayName = profile.name || username;
-    const verifiedBadge = profile.verified 
-      ? ' <i class="fas fa-check-circle verified-badge" title="Verified by Vault 13"></i>' 
-      : '';
-    displayNameEl.innerHTML = displayName + verifiedBadge;
+      // === TRACK VIEWER (if logged in) ===
+      const viewer = localStorage.getItem('loggedIn');
+      if (viewer && viewer !== username) {
+        const viewersKey = `viewers_${username}`;
+        let viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
+        const timestamp = new Date().toISOString().split('T')[0];
+        const existing = viewers.find(v => v.user === viewer);
+        if (existing) existing.date = timestamp;
+        else viewers.push({ user: viewer, date: timestamp });
+        viewers = viewers.slice(-20);
+        localStorage.setItem(viewersKey, JSON.stringify(viewers));
+      }
 
-    $('bio').textContent = profile.bio || 'No bio yet.';
+      // === LOAD PROFILE ===
+      $('username').textContent = `@${username}`;
 
-    const avatarUrl = profile.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
-    $('avatar').style.backgroundImage = `url(${avatarUrl})`;
+      const displayNameEl = $('displayName');
+      const displayName = profile.name || (username === 'profile' ? 'User' : username);
+      const verifiedBadge = profile.verified 
+        ? ' <i class="fas fa-check-circle verified-badge" title="Verified by Vault 13"></i>' 
+        : '';
+      displayNameEl.innerHTML = displayName + verifiedBadge;
 
-    if (profile.bgImage) {
-      const bg = $('profileBg');
-      bg.style.backgroundImage = `url(${profile.bgImage})`;
-      bg.classList.add('active');
-    }
+      $('bio').textContent = profile.bio || 'No bio yet.';
 
-    const socialContainer = $('socialLinks');
-    const platforms = {
-      discord: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg', format:u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`},
-      twitter: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg', format:u=>`https://twitter.com/${u}`},
-      instagram:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg', format:u=>`https://instagram.com/${u}`},
-      twitch:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg', format:u=>`https://twitch.tv/${u}`},
-      github:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg', format:u=>`https://github.com/${u}`},
-      youtube:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg', format:u=>`https://youtube.com/@${u}`},
-      tiktok:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg', format:u=>`https://tiktok.com/@${u}`},
-      spotify:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg', format:u=>`https://open.spotify.com/user/${u}`},
-      steam:    {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg', format:u=>`https://steamcommunity.com/id/${u}`},
-      reddit:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg', format:u=>`https://reddit.com/user/${u}`}
-    };
+      const avatarUrl = profile.avatar || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="%23202050"/><path fill="%238a2be2" d="M60 30a30 30 0 0 0-30 30c0 12 12 30 30 30s30-18 30-30a30 30 0 0 0-30-30z"/></svg>';
+      $('avatar').style.backgroundImage = `url(${avatarUrl})`;
 
-    (profile.links || []).forEach(link => {
-      const p = platforms[link.platform];
-      if (!p) return;
-      const a = document.createElement('a');
-      a.href = p.format(link.username);
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.className = 'social-btn';
-      a.title = link.platform;
-      a.innerHTML = `<img src="${p.icon}" alt="${link.platform}">`;
-      socialContainer.appendChild(a);
+      // === BACKGROUND (use `bg`, not `bgImage`) ===
+      if (profile.bg) {
+        const bg = $('profileBg');
+        bg.style.backgroundImage = `url(${profile.bg})`;
+        bg.classList.add('active');
+      }
+
+      // === SOCIAL LINKS ===
+      const socialContainer = $('socialLinks');
+      const platforms = {
+        discord: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/discord.svg', format:u=>u.includes('discord.gg/')?u:`https://discord.gg/${u}`},
+        twitter: {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitter.svg', format:u=>`https://twitter.com/${u}`},
+        instagram:{icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/instagram.svg', format:u=>`https://instagram.com/${u}`},
+        twitch:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/twitch.svg', format:u=>`https://twitch.tv/${u}`},
+        github:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/github.svg', format:u=>`https://github.com/${u}`},
+        youtube:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/youtube.svg', format:u=>`https://youtube.com/@${u}`},
+        tiktok:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/tiktok.svg', format:u=>`https://tiktok.com/@${u}`},
+        spotify:  {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/spotify.svg', format:u=>`https://open.spotify.com/user/${u}`},
+        steam:    {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/steam.svg', format:u=>`https://steamcommunity.com/id/${u}`},
+        reddit:   {icon:'https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/reddit.svg', format:u=>`https://reddit.com/user/${u}`}
+      };
+
+      (profile.links || []).forEach(link => {
+        const p = platforms[link.platform];
+        if (!p) return;
+        const a = document.createElement('a');
+        a.href = p.format(link.username);
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'social-btn';
+        a.title = link.platform;
+        a.innerHTML = `<img src="${p.icon}" alt="${link.platform}">`;
+        socialContainer.appendChild(a);
+      });
+
+      // === MUSIC AUTO-PLAY WITH UNLOCK ===
+      let audioUnlocked = false;
+      const audio = $('bgAudio');
+      audio.loop = true;
+      audio.volume = 0.6;
+      const unlockPrompt = $('audioUnlock');
+
+      if (profile.mp3) {
+        audio.src = profile.mp3;
+
+        const tryPlay = () => {
+          audio.play().then(() => {
+            audioUnlocked = true;
+            unlockPrompt.classList.remove('show');
+          }).catch(() => {
+            unlockPrompt.classList.add('show');
+          });
+        };
+
+        const unlockAudio = () => {
+          if (audioUnlocked) return;
+          audio.play().then(() => {
+            audioUnlocked = true;
+            unlockPrompt.classList.remove('show');
+          });
+          document.body.removeEventListener('click', unlockAudio);
+          document.body.removeEventListener('touchstart', unlockAudio);
+          document.body.removeEventListener('keydown', unlockAudio);
+        };
+
+        window.addEventListener('load', tryPlay);
+        document.body.addEventListener('click', unlockAudio);
+        document.body.addEventListener('touchstart', unlockAudio);
+        document.body.addEventListener('keydown', unlockAudio);
+      }
+
+      // === VIEWERS BOX (only for owner) ===
+      const loggedInUser = localStorage.getItem('loggedIn');
+      if (loggedInUser && loggedInUser === username) {
+        const viewersKey = `viewers_${username}`;
+        const viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
+        const list = $('viewerList');
+        const box = $('viewerBox');
+
+        if (viewers.length > 0) {
+          list.innerHTML = viewers.reverse().slice(0, 20).map(v =>
+            `<div class="viewer-item"><strong>@${v.user}</strong><span>${v.date}</span></div>`
+          ).join('');
+        } else {
+          list.innerHTML = '<em style="opacity:.6;">No visitors yet.</em>';
+        }
+        box.style.display = 'block';
+      }
+
+      // === HOME BUTTON (fixed base path) ===
+      const pathParts = location.pathname.split('/').filter(p => p);
+      pathParts.pop(); // remove profile or username
+      const base = location.origin + '/' + pathParts.join('/') + '/';
+      $('homeBtn').href = loggedInUser
+        ? `${base}dashboard.html?u=${loggedInUser}`
+        : `${base}dashboard.html`;
+
+      // === STARS ===
+      function createStars() {
+        const c = $('stars');
+        for (let i = 0; i < 70; i++) {
+          const s = document.createElement('div');
+          s.className = 'star';
+          s.style.width = s.style.height = Math.random() * 2.5 + 1 + 'px';
+          s.style.left = Math.random() * 100 + '%';
+          s.style.top = Math.random() * 100 + '%';
+          s.style.animationDelay = Math.random() * 3 + 's';
+          c.appendChild(s);
+        }
+      }
+      createStars();
+
+      // === SECURITY ===
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.addEventListener('selectstart', e => e.preventDefault());
+      document.addEventListener('dragstart', e => e.preventDefault());
     });
-
-    // MUSIC AUTO-PLAY WITH UNLOCK
-    let audioUnlocked = false;
-    const audio = $('bgAudio');
-    audio.loop = true;
-    audio.volume = 0.6;
-    const unlockPrompt = $('audioUnlock');
-
-    if (profile.mp3) {
-      audio.src = profile.mp3;
-
-      const tryPlay = () => {
-        audio.play().then(() => {
-          audioUnlocked = true;
-          unlockPrompt.classList.remove('show');
-        }).catch(() => {
-          unlockPrompt.classList.add('show');
-        });
-      };
-
-      const unlockAudio = () => {
-        if (audioUnlocked) return;
-        audio.play().then(() => {
-          audioUnlocked = true;
-          unlockPrompt.classList.remove('show');
-        }).catch(() => {});
-        document.body.removeEventListener('click', unlockAudio);
-        document.body.removeEventListener('touchstart', unlockAudio);
-        document.body.removeEventListener('keydown', unlockAudio);
-      };
-
-      if (document.readyState === 'complete') tryPlay();
-      else window.addEventListener('load', tryPlay);
-
-      document.body.addEventListener('click', unlockAudio);
-      document.body.addEventListener('touchstart', unlockAudio);
-      document.body.addEventListener('keydown', unlockAudio);
-    }
-
-    // VIEWERS BOX
-    const loggedInUser = localStorage.getItem('loggedIn');
-    if (loggedInUser && loggedInUser === username) {
-      const viewersKey = `viewers_${username}`;
-      const viewers = JSON.parse(localStorage.getItem(viewersKey) || '[]');
-      const list = $('viewerList');
-      const box = $('viewerBox');
-
-      if (viewers.length > 0) {
-        list.innerHTML = viewers.reverse().slice(0, 20).map(v =>
-          `<div class="viewer-item"><strong>@${v.user}</strong><span>${v.date}</span></div>`
-        ).join('');
-      } else {
-        list.innerHTML = '<em style="opacity:.6;">No visitors yet.</em>';
-      }
-      box.style.display = 'block';
-    }
-
-    // HOME BUTTON
-    const base = location.origin + location.pathname.replace(/profile[^/]*$/, '');
-    $('homeBtn').href = loggedInUser
-      ? `${base}dashboard.html?u=${loggedInUser}`
-      : `${base}dashboard.html`;
-
-    // STARS
-    function createStars() {
-      const c = $('stars');
-      for (let i = 0; i < 70; i++) {
-        const s = document.createElement('div');
-        s.className = 'star';
-        s.style.width = s.style.height = Math.random() * 2.5 + 1 + 'px';
-        s.style.left = Math.random() * 100 + '%';
-        s.style.top = Math.random() * 100 + '%';
-        s.style.animationDelay = Math.random() * 3 + 's';
-        c.appendChild(s);
-      }
-    }
-    createStars();
-
-    // SECURITY
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('selectstart', e => e.preventDefault());
-    document.addEventListener('dragstart', e => e.preventDefault());
   </script>
 </body>
 </html>

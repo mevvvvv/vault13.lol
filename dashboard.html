@@ -21,7 +21,7 @@
       --glow-outer:0 0 35px rgba(138,43,226,.6);--accent:#8a2be2;--accent2:#00d4ff;
       --text:#e0d9ff;--text-dim:#b19cd9;--input-bg:rgba(20,20,50,.7);
       --transition:all .4s cubic-bezier(.23,1,.32,1);
-      --check-fill:#e0d9ff; /* Soft neon white */
+      --check-fill:#e0d9ff;
     }
     *{margin:0;padding:0;box-sizing:border-box;}
     body{background:var(--bg);color:var(--text);font-family:'Roboto Mono',monospace;
@@ -137,7 +137,6 @@
     .user-item{padding:.8rem;background:rgba(138,43,226,.1);border-radius:10px;
                margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;font-size:.9rem;}
 
-    /* ADMIN PANEL CUSTOM CHECKBOX — NO TEXT, SOFT NEON FILL */
     .verify-toggle {
       display: flex;
       align-items: center;
@@ -159,7 +158,7 @@
       transition: var(--transition);
     }
     .verify-toggle input[type="checkbox"]:checked {
-      background: var(--check-fill); /* Soft neon white */
+      background: var(--check-fill);
       border-color: #b19cd9;
       box-shadow: inset 0 0 10px rgba(224, 217, 255, 0.4),
                   0 0 12px rgba(0, 212, 255, 0.4);
@@ -305,7 +304,7 @@
   </div>
 
   <script>
-    // === FIREBASE CONFIG — REPLACE WITH YOURS ===
+    // === FIREBASE CONFIG ===
     const firebaseConfig = {
       apiKey: "AIzaSyC2PXUqXm3AM3AE8mCimoySbxyrDxNeoIc",
       authDomain: "vault13profiles.firebaseapp.com",
@@ -374,17 +373,14 @@
       $('adminBadge').style.display = isAdmin ? 'inline' : 'none';
       document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
 
-      // Load from Firestore
       const doc = await db.collection('profiles').doc(u).get();
       let p = doc.exists ? doc.data() : {};
 
-      // Fallback to localStorage
       if (!p.name) {
         const local = localStorage.getItem(`profile_${u}`);
         if (local) p = JSON.parse(local);
       }
 
-      // Update UI
       $('dashUser').textContent = u;
       $('dashDisplayName').textContent = p.name || u;
       $('dashUsername').textContent = `@${u}`;
@@ -563,7 +559,12 @@
       }
     };
 
-    $('clearAllBtn').onclick = () => { if (confirm('ERASE ALL DATA?')) { db.collection('profiles').get().then(s => s.docs.forEach(d => d.ref.delete())); location.reload(); } };
+    $('clearAllBtn').onclick = () => { 
+      if (confirm('ERASE ALL DATA?')) { 
+        db.collection('profiles').get().then(s => s.docs.forEach(d => d.ref.delete())); 
+        location.reload(); 
+      } 
+    };
     $('exportBtn').onclick = async () => {
       const snap = await db.collection('profiles').get();
       const data = {};
@@ -578,22 +579,28 @@
     };
     $('forceLogoutBtn').onclick = () => alert('Not implemented.');
 
+    // SECURE DASHBOARD ACCESS
     window.onload = async () => {
       createStars();
       $('stars').style.opacity = '1'; $('grid').style.opacity = '1'; $('scanline').style.opacity = '1';
       setInterval(updateUptime, 1000);
 
-      const savedUser = localStorage.getItem('loggedIn');
+      const loggedInUser = localStorage.getItem('loggedIn');
       const urlUser = new URLSearchParams(location.search).get('u');
-      const finalUser = urlUser || savedUser;
 
-      if (!finalUser) {
+      if (!loggedInUser) {
         alert('Access denied.');
         location.href = 'index.html';
         return;
       }
 
-      localStorage.setItem('loggedIn', finalUser);
+      if (urlUser && urlUser.toLowerCase() !== loggedInUser.toLowerCase()) {
+        alert('You can only access your own dashboard.');
+        location.href = location.pathname + '?u=' + encodeURIComponent(loggedInUser);
+        return;
+      }
+
+      const finalUser = loggedInUser;
       await goDash(finalUser);
     };
   </script>

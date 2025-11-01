@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vault 13 – Enter</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <div class="crosshair" id="crosshair"></div>
+  <div class="vault-door active" id="vaultDoor">
+    <div class="vault-glitch">
+      <div class="vault-circle"></div>
+      <div class="vault-13">13</div>
+      <div class="static"></div>
+    </div>
+  </div>
+
+  <div class="stars" id="stars"></div>
+  <div class="grid" id="grid"></div>
+  <div class="scanline" id="scanline"></div>
+
+  <div class="enter" id="enter">
+    <h1>VAULT 13</h1>
+    <p>Owner @w8.it</p>
+    <div class="hint">Click to enter the cosmos</div>
+  </div>
+
+  <script src="assets/script.js"></script>
+  <script>
+    // Show background after door animation
+    window.onload = () => {
+      setTimeout(() => {
+        $('vaultDoor').classList.remove('active');
+        $('stars').style.opacity = '1';
+        $('grid').style.opacity = '1';
+        $('scanline').style.opacity = '1';
+        createStars();
+        setInterval(updateVisitors, 3000);
+        setInterval(updateUptime, 1000);
+      }, 2400);
+    };
+
+    $('enter').onclick = () => {
+      $('enter').classList.add('fade');
+      setTimeout(() => location.href = 'login.html', 800);
+    };
+  </script>
+</body>
+</html>

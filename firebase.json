@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "C:\\Users\\User\\Downloads\\vault.lol site",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

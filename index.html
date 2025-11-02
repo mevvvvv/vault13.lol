@@ -9,15 +9,35 @@
 
         :root {
             --bg: #000;
-            --card: rgba(8, 8, 12, 0.2); /* 80% transparent */
-            --border: rgba(255, 255, 255, 0.18);
-            --glow: rgba(255, 255, 255, 0.1);
-            --text: #ccc;
-            --subtext: #999;
+            --card: rgba(8, 8, 12, 0.1);
+            --border: rgba(255, 255, 255, 0.1);
+            --glow: rgba(255, 255, 255, 0.05);
+            --text: #fff;
+            --subtext: #ccc;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; background: var(--bg); font-family: 'Orbitron', sans-serif; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        
+        html, body { 
+            height: 100%; 
+            overflow: hidden; 
+            background: var(--bg); 
+            font-family: 'Orbitron', sans-serif; 
+        }
+
+        /* Remove text selection */
+        *::selection {
+            background: transparent;
+        }
+        *::-moz-selection {
+            background: transparent;
+        }
 
         /* Background GIF */
         .bg-gif {
@@ -47,18 +67,35 @@
         .title {
             font-size: 2.8rem;
             font-weight: 900;
-            color: var(--text);
-            text-shadow: 0 0 12px var(--glow);
+            color: #ffffff;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #fff,
+                0 0 20px #000,
+                0 0 35px #000,
+                0 0 40px #000;
             letter-spacing: 0.15em;
             margin-bottom: 0.8rem;
+            min-height: 1.2em;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .enter {
             font-size: 1rem;
-            color: var(--subtext);
+            color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 0.2em;
             font-weight: 500;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #000,
+                0 0 20px #000;
+            min-height: 1.2em;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         /* Fade Out */
@@ -83,8 +120,7 @@
             border-radius: 16px;
             padding: 2rem 1.8rem;
             text-align: center;
-            box-shadow: 0 0 25px var(--glow);
-            backdrop-filter: blur(18px);
+            backdrop-filter: blur(8px);
             z-index: 5;
             opacity: 0;
             pointer-events: none;
@@ -103,7 +139,6 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--border);
-            box-shadow: 0 0 15px var(--glow);
         }
         .ring-glow {
             position: absolute;
@@ -122,10 +157,35 @@
         .name {
             font-size: 1.6rem;
             font-weight: 900;
-            color: var(--text);
-            margin-bottom: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
             letter-spacing: 0.1em;
-            text-shadow: 0 0 6px var(--glow);
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #fff,
+                0 0 20px #000,
+                0 0 35px #000,
+                0 0 40px #000;
+            min-height: 1.2em;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Bio with Typewriter Effect */
+        .bio {
+            font-size: 1rem;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            min-height: 1.5em;
+            letter-spacing: 0.1em;
+            overflow: hidden;
+            white-space: nowrap;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #000,
+                0 0 20px #000;
         }
 
         /* Circle Links */
@@ -148,7 +208,6 @@
         .circle:hover {
             background: rgba(255, 255, 255, 0.08);
             transform: scale(1.2) translateY(-6px);
-            box-shadow: 0 0 18px var(--glow);
         }
         .circle img {
             width: 26px; height: 26px;
@@ -156,7 +215,7 @@
             opacity: 0.85;
         }
 
-        /* Audio Player - 80% Transparent */
+        /* Audio Player */
         #audio-player {
             position: fixed;
             bottom: 1rem;
@@ -164,7 +223,7 @@
             transform: translateX(-50%);
             width: 90%;
             max-width: 500px;
-            background: rgba(8, 8, 12, 0.2);
+            background: rgba(8, 8, 12, 0.1);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 0.6rem 1rem;
@@ -176,16 +235,19 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 1s ease;
-            backdrop-filter: blur(14px);
+            backdrop-filter: blur(8px);
         }
         #audio-player.show { opacity: 1; pointer-events: all; }
 
         .song-name {
             font-size: 0.75rem;
-            color: var(--text);
+            color: #ffffff;
             font-weight: 600;
             letter-spacing: 0.05em;
             opacity: 0.9;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #000;
         }
 
         .player-controls {
@@ -199,7 +261,7 @@
         .play-btn {
             background: none;
             border: 1.2px solid var(--border);
-            color: var(--text);
+            color: #ffffff;
             width: 38px; height: 38px;
             border-radius: 50%;
             font-size: 0.9rem;
@@ -209,11 +271,13 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #000;
         }
         .play-btn:hover {
             background: rgba(255, 255, 255, 0.06);
             transform: scale(1.12);
-            box-shadow: 0 0 12px var(--glow);
         }
 
         .progress-container {
@@ -226,10 +290,58 @@
         }
         .progress {
             height: 100%;
-            background: var(--text);
+            background: #ffffff;
             width: 0%;
             border-radius: 2px;
             opacity: 0.7;
+            box-shadow: 0 0 5px #fff, 0 0 10px #000;
+        }
+
+        /* Volume Control */
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .volume-icon {
+            color: #ffffff;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #000;
+        }
+
+        .volume-slider {
+            width: 70px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            opacity: 0.8;
+            box-shadow: 0 0 5px #fff, 0 0 10px #000;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            opacity: 0.8;
+            border: none;
+            box-shadow: 0 0 5px #fff, 0 0 10px #000;
         }
 
         /* Mobile */
@@ -251,8 +363,8 @@
 
     <!-- Landing -->
     <div id="landing" onclick="enter()">
-        <div class="title">mev/vsqz</div>
-        <div class="enter">click to enter hell</div>
+        <div class="title" id="landing-title"></div>
+        <div class="enter" id="landing-subtitle"></div>
     </div>
 
     <!-- Audio (Loop Forever) -->
@@ -264,7 +376,8 @@
             <div class="ring-glow"></div>
             <img src="https://cdn.discordapp.com/attachments/1363714836621689002/1434441273703534713/mhhh.png?ex=6908570a&is=6907058a&hm=a045d8b3594ec75bfad7b8e8e6cba84a81f8c6fcfe98a68f9c2448370d028124&" alt="pfp" class="pfp">
         </div>
-        <div class="name">mev/vsqz</div>
+        <div class="name" id="profile-name"></div>
+        <div class="bio" id="bio"></div>
 
         <!-- Circle Links -->
         <div class="circle-links">
@@ -284,8 +397,13 @@
     <div id="audio-player">
         <div class="song-name">Freestyle - mev/vsqz</div>
         <div class="player-controls">
+            <button class="play-btn" id="play-btn">▶</button>
             <div class="progress-container">
                 <div class="progress" id="progress"></div>
+            </div>
+            <div class="volume-container">
+                <span class="volume-icon">🔊</span>
+                <input type="range" min="0" max="1" step="0.01" value="0.5" class="volume-slider" id="volume-slider">
             </div>
         </div>
     </div>
@@ -295,10 +413,70 @@
         const progress = document.getElementById('progress');
         const frame = document.getElementById('frame');
         const player = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-btn');
+        const volumeSlider = document.getElementById('volume-slider');
+        const bio = document.getElementById('bio');
+        const landingTitle = document.getElementById('landing-title');
+        const landingSubtitle = document.getElementById('landing-subtitle');
+        const profileName = document.getElementById('profile-name');
+
+        // Remove focus outlines
+        document.addEventListener('mousedown', function() {
+            document.activeElement.blur();
+        });
 
         // Force loop
         audio.loop = true;
         audio.onended = () => audio.play();
+
+        // Typewriter function with delete and repeat
+        function typeWriterRepeat(element, text, speed = 100, pause = 2000) {
+            let isDeleting = false;
+            let i = 0;
+            
+            function type() {
+                const currentText = text.substring(0, i);
+                
+                if (!isDeleting) {
+                    // Typing phase
+                    element.textContent = currentText;
+                    i++;
+                    
+                    if (i > text.length) {
+                        // Finished typing, pause then start deleting
+                        setTimeout(() => {
+                            isDeleting = true;
+                            type();
+                        }, pause);
+                        return;
+                    }
+                } else {
+                    // Deleting phase
+                    element.textContent = currentText;
+                    i--;
+                    
+                    if (i === 0) {
+                        // Finished deleting, pause then start typing again
+                        isDeleting = false;
+                        setTimeout(type, speed * 2);
+                        return;
+                    }
+                }
+                
+                setTimeout(type, isDeleting ? speed / 2 : speed);
+            }
+            
+            // Start the animation
+            type();
+        }
+
+        // Start typewriter effects on page load
+        window.onload = function() {
+            typeWriterRepeat(landingTitle, "mev/vsqz", 120, 3000);
+            setTimeout(() => {
+                typeWriterRepeat(landingSubtitle, "click to enter hell", 80, 2500);
+            }, 1000);
+        };
 
         // Enter
         function enter() {
@@ -308,14 +486,36 @@
                 document.getElementById('landing').style.display = 'none';
                 frame.classList.add('in');
                 player.classList.add('show');
+                
+                // Start profile typewriter effects
+                typeWriterRepeat(profileName, "mev/vsqz", 120, 3000);
+                setTimeout(() => {
+                    typeWriterRepeat(bio, "Gate Way To Hell", 100, 2500);
+                }, 1000);
             }, 1400);
         }
+
+        // Play/Pause button
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playBtn.textContent = '❚❚';
+            } else {
+                audio.pause();
+                playBtn.textContent = '▶';
+            }
+        });
 
         // Progress bar (visual only)
         audio.ontimeupdate = () => {
             const percent = (audio.currentTime / audio.duration) * 100 || 0;
             progress.style.width = percent + '%';
         };
+
+        // Volume control
+        volumeSlider.addEventListener('input', () => {
+            audio.volume = volumeSlider.value;
+        });
 
         // Mouse Tilt
         document.addEventListener('mousemove', (e) => {

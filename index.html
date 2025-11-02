@@ -8,14 +8,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap');
 
         :root {
-            --p: #9d4edd;
             --bg: #000;
+            --card: rgba(8, 8, 12, 0.2); /* 80% transparent */
+            --border: rgba(255, 255, 255, 0.18);
+            --glow: rgba(255, 255, 255, 0.1);
+            --text: #ccc;
+            --subtext: #999;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; background: var(--bg); }
+        html, body { height: 100%; overflow: hidden; background: var(--bg); font-family: 'Orbitron', sans-serif; }
 
-        /* Full GIF Background */
+        /* Background GIF */
         .bg-gif {
             position: fixed;
             top: 50%; left: 50%;
@@ -24,7 +28,7 @@
             transform: translate(-50%, -50%);
             z-index: 0;
             object-fit: cover;
-            filter: brightness(0.85) contrast(1.15);
+            filter: brightness(0.9) contrast(1.2);
         }
 
         /* Landing */
@@ -41,62 +45,53 @@
         }
 
         .title {
-            font-family: 'Orbitron', sans-serif;
             font-size: 2.8rem;
             font-weight: 900;
-            color: #fff;
-            text-shadow: 0 0 15px var(--p), 0 0 30px var(--p);
+            color: var(--text);
+            text-shadow: 0 0 12px var(--glow);
             letter-spacing: 0.15em;
             margin-bottom: 0.8rem;
         }
 
         .enter {
-            font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
-            color: var(--p);
+            color: var(--subtext);
             text-transform: uppercase;
             letter-spacing: 0.2em;
             font-weight: 500;
-            text-shadow: 0 0 10px var(--p);
         }
 
-        /* Glitch Out */
+        /* Fade Out */
         #landing.out {
-            animation: glitchFade 1.4s forwards;
+            animation: fadeOut 1.4s forwards;
             pointer-events: none;
         }
-        @keyframes glitchFade {
-            0% { opacity: 1; filter: blur(0); }
-            50% { opacity: 0.7; filter: blur(2px); transform: scale(1.02); }
-            100% { opacity: 0; filter: blur(8px); transform: scale(1.05); }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; filter: blur(14px); transform: scale(1.05); }
         }
 
-        /* Advanced Center Frame */
+        /* Ultra-Ghost Frame */
         #frame {
             position: fixed;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) perspective(1000px);
             width: 90%;
             max-width: 460px;
-            background: rgba(8, 8, 12, 0.92);
-            border: 1.5px solid var(--p);
-            border-radius: 14px;
+            background: var(--card);
+            border: 1.2px solid var(--border);
+            border-radius: 16px;
             padding: 2rem 1.8rem;
             text-align: center;
-            box-shadow: 
-                0 0 40px rgba(157, 78, 221, 0.6),
-                inset 0 0 20px rgba(157, 78, 221, 0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 0 25px var(--glow);
+            backdrop-filter: blur(18px);
             z-index: 5;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: opacity 1s ease;
+            transform-style: preserve-3d;
         }
-        #frame.in {
-            opacity: 1;
-            pointer-events: all;
-            transform: translate(-50%, -50%) scale(1);
-        }
+        #frame.in { opacity: 1; pointer-events: all; }
 
         .pfp-ring {
             position: relative;
@@ -107,86 +102,145 @@
             width: 100%; height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px var(--p);
+            border: 2px solid var(--border);
+            box-shadow: 0 0 15px var(--glow);
         }
         .ring-glow {
             position: absolute;
             top: -8px; left: -8px;
             width: 126px; height: 126px;
-            border: 2px solid var(--p);
+            border: 1.5px solid var(--border);
             border-radius: 50%;
-            opacity: 0.7;
-            animation: pulseRing 3s infinite;
+            opacity: 0.2;
+            animation: pulse 5s infinite;
         }
-        @keyframes pulseRing {
-            0%, 100% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.15); opacity: 0.4; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.25); opacity: 0.05; }
         }
 
         .name {
-            font-family: 'Orbitron', sans-serif;
             font-size: 1.6rem;
             font-weight: 900;
-            color: var(--p);
+            color: var(--text);
             margin-bottom: 1.5rem;
             letter-spacing: 0.1em;
-            text-shadow: 0 0 10px var(--p);
+            text-shadow: 0 0 6px var(--glow);
         }
 
-        .links {
+        /* Circle Links */
+        .circle-links {
             display: flex;
-            flex-direction: column;
-            gap: 0.9rem;
+            justify-content: center;
+            gap: 1.4rem;
+            margin-bottom: 1.8rem;
         }
-        .link {
-            background: rgba(157, 78, 221, 0.12);
-            border: 1px solid var(--p);
-            border-radius: 10px;
-            padding: 0.85rem;
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-decoration: none;
+        .circle {
+            width: 50px; height: 50px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.2px solid var(--border);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.35s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.4s ease;
         }
-        .link::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition: 0.5s;
+        .circle:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.2) translateY(-6px);
+            box-shadow: 0 0 18px var(--glow);
         }
-        .link:hover::before { left: 100%; }
-        .link:hover {
-            background: rgba(157, 78, 221, 0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(157, 78, 221, 0.3);
-        }
-        .link img {
-            width: 18px; height: 18px;
-            margin-right: 8px;
+        .circle img {
+            width: 26px; height: 26px;
             filter: brightness(0) invert(1);
+            opacity: 0.85;
         }
 
-        /* Audio */
-        #sfx { display: none; }
+        /* Audio Player - 80% Transparent */
+        #audio-player {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            background: rgba(8, 8, 12, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            backdrop-filter: blur(14px);
+        }
+        #audio-player.show { opacity: 1; pointer-events: all; }
+
+        .song-name {
+            font-size: 0.75rem;
+            color: var(--text);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .play-btn {
+            background: none;
+            border: 1.2px solid var(--border);
+            color: var(--text);
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .play-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: scale(1.12);
+            box-shadow: 0 0 12px var(--glow);
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 0.8rem;
+        }
+        .progress {
+            height: 100%;
+            background: var(--text);
+            width: 0%;
+            border-radius: 2px;
+            opacity: 0.7;
+        }
 
         /* Mobile */
         @media (max-width: 480px) {
             .title { font-size: 2.2rem; }
             .enter { font-size: 0.85rem; }
-            #frame { padding: 1.6rem 1.4rem; max-width: 92%; }
-            .pfp-ring { width: 90px; height: 90px; }
-            .ring-glow { width: 106px; height: 106px; top: -8px; left: -8px; }
-            .name { font-size: 1.4rem; }
+            #frame { padding: 1.6rem; }
+            .circle { width: 44px; height: 44px; }
+            .circle img { width: 22px; height: 22px; }
+            .play-btn { width: 34px; height: 34px; font-size: 0.8rem; }
+            .song-name { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -201,39 +255,92 @@
         <div class="enter">click to enter hell</div>
     </div>
 
-    <!-- Audio -->
-    <audio id="sfx" src="https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3"></audio>
+    <!-- Audio (Loop Forever) -->
+    <audio id="hellsong" src="https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3" loop preload="auto"></audio>
 
-    <!-- Advanced Frame -->
+    <!-- Main Frame -->
     <div id="frame">
         <div class="pfp-ring">
             <div class="ring-glow"></div>
-            <!-- CHANGE PFP -->
             <img src="https://cdn.discordapp.com/attachments/1363714836621689002/1434441273703534713/mhhh.png?ex=6908570a&is=6907058a&hm=a045d8b3594ec75bfad7b8e8e6cba84a81f8c6fcfe98a68f9c2448370d028124&" alt="pfp" class="pfp">
         </div>
         <div class="name">mev/vsqz</div>
-        <div class="links">
-            <!-- EDIT LINKS -->
-            <a href="#" class="link"><img src="https://cdn.simpleicons.org/discord/white"> Discord</a>
-            <a href="#" class="link"><img src="https://cdn.simpleicons.org/roblox/white"> Roblox</a>
-            <a href="https://github.com/mevvvvv" class="link"><img src="https://cdn.simpleicons.org/github/white"> GitHub</a>
+
+        <!-- Circle Links -->
+        <div class="circle-links">
+            <a href="https://discord.gg/bkNT9x3qs9" target="_blank" class="circle">
+                <img src="https://cdn.simpleicons.org/discord/white" alt="Discord">
+            </a>
+            <a href="nhttps://www.roblox.com/users/7758899851/profile" target="_blank" class="circle">
+                <img src="https://cdn.simpleicons.org/roblox/white" alt="Roblox">
+            </a>
+            <a href="https://github.com/mevvvvv" target="_blank" class="circle">
+                <img src="https://cdn.simpleicons.org/github/white" alt="GitHub">
+            </a>
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <div id="audio-player">
+        <div class="song-name">heheee.mp3</div>
+        <div class="player-controls">
+            <button class="play-btn" id="playPause">▶</button>
+            <div class="progress-container">
+                <div class="progress" id="progress"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        const audio = document.getElementById('hellsong');
+        const playPause = document.getElementById('playPause');
+        const progress = document.getElementById('progress');
+        const frame = document.getElementById('frame');
+        const player = document.getElementById('audio-player');
+
+        // Force loop
+        audio.loop = true;
+        audio.onended = () => audio.play();
+
+        // Enter
         function enter() {
-            const land = document.getElementById('landing');
-            const frame = document.getElementById('frame');
-            const audio = document.getElementById('sfx');
-
-            audio.play().catch(() => {});
-            land.classList.add('out');
-
+            document.getElementById('landing').classList.add('out');
+            audio.play();
             setTimeout(() => {
-                land.style.display = 'none';
+                document.getElementById('landing').style.display = 'none';
                 frame.classList.add('in');
+                player.classList.add('show');
+                updatePlayPause();
             }, 1400);
         }
+
+        // Toggle Play/Pause
+        playPause.onclick = () => {
+            if (audio.paused) audio.play();
+            else audio.pause();
+            updatePlayPause();
+        };
+
+        function updatePlayPause() {
+            playPause.textContent = audio.paused ? '▶' : '❚❚';
+        }
+
+        // Progress bar (visual only)
+        audio.ontimeupdate = () => {
+            const percent = (audio.currentTime / audio.duration) * 100 || 0;
+            progress.style.width = percent + '%';
+        };
+
+        // Mouse Tilt
+        document.addEventListener('mousemove', (e) => {
+            if (!frame.classList.contains('in')) return;
+            const x = (window.innerWidth / 2 - e.clientX) / 45;
+            const y = (window.innerHeight / 2 - e.clientY) / 45;
+            frame.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${y}deg) rotateY(${x}deg)`;
+        });
+        document.addEventListener('mouseleave', () => {
+            frame.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0) rotateY(0)`;
+        });
     </script>
 
 </body>

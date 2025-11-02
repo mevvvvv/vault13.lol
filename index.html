@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gooning Leaderboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    /* ────────────────────────────────── VARIABLES ────────────────────────────────── */
+    :root {
+      --bg: #050505;
+      --glass: #111111ee;
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text: #f5f5f5;
+      --muted: #aaaaaa;
+      --glow: #ffffff;
+      --accent: #ffffff;
+      --discord: #cccccc;
+      --transition: 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --scrollbar: #444;
+      --scrollbar-hover: #666;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ────────────────────────────────── BODY & STARFALL BACKGROUND ────────────────────────────────── */
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      overflow: hidden;
+      color: var(--text);
+      position: relative;
+    }
+
+    /* Animated Falling Stars */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100px) scale(0.2);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      90% { opacity: 0.3; }
+      100% {
+        transform: translateY(100vh) scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    /* ────────────────────────────────── APP CONTAINER ────────────────────────────────── */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #app {
+      max-width: 860px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(20px);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px 28px;
+      box-shadow:
+        0 16px 60px rgba(0, 0, 0, 0.8),
+        inset 0 0 40px rgba(255, 255, 255, 0.05);
+      transition: all 0.5s var(--transition);
+      overflow: hidden;
+    }
+
+    #app:hover {
+      transform: translateY(-8px);
+      box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(255, 255, 255, 0.12);
+    }
+
+    /* ────────────────────────────────── TITLE ────────────────────────────────── */
+    h1 {
+      text-align: center;
+      font-weight: 800;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #fff, #ccc);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      margin-bottom: 24px;
+      animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+      to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.2); }
+    }
+
+    /* ────────────────────────────────── TABLE CONTAINER ────────────────────────────────── */
+    .table-container {
+      max-height: 68vh;
+      overflow-y: auto;
+      border-radius: 16px;
+      margin-top: 16px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.4);
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar) transparent;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 10px;
+    }
+    .table-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background: var(--scrollbar);
+      border-radius: 6px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-hover);
+      background-clip: content-box;
+    }
+
+    /* ────────────────────────────────── TABLE ────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(180deg, rgba(25, 25, 25, 0.98), rgba(15, 15, 15, 0.95));
+      backdrop-filter: blur(12px);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 1.6px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      transition: all 0.3s var(--transition);
+    }
+
+    tr {
+      transition: all 0.4s var(--transition);
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.09);
+      transform: translateX(6px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08);
+    }
+
+    /* Rank Styling */
+    .rank {
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 1.3rem;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    .rank:nth-of-type(1) { color: #ffd700; font-size: 1.5rem; text-shadow: 0 0 20px #ffd700; }
+    .rank:nth-of-type(2) { color: #c0c0c0; font-size: 1.45rem; text-shadow: 0 0 18px #c0c0c0; }
+    .rank:nth-of-type(3) { color: #cd7f32; font-size: 1.4rem; text-shadow: 0 0 16px #cd7f32; }
+
+    /* Player Name */
+    .name {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.98rem;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    tr:hover .avatar {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Discord Tag */
+    .discord-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--discord);
+      font-weight: 500;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .discord-tag i {
+      filter: drop-shadow(0 0 5px #5865f2);
+      animation: discordPulse 2.5s infinite alternate;
+    }
+
+    @keyframes discordPulse {
+      from { filter: drop-shadow(0 0 5px #5865f2); }
+      to { filter: drop-shadow(0 0 12px #5865f2); }
+    }
+
+    /* Empty Slot */
+    .empty-slot {
+      color: #666;
+      font-style: italic;
+      font-size: 0.94rem;
+    }
+
+    /* ────────────────────────────────── LOADER ────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1s ease;
+      z-index: 100;
+      cursor: pointer;
+    }
+
+    #logo {
+      font-size: 3.6rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 5px;
+      background: linear-gradient(45deg, #fff, #aaa);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: glow 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); opacity: 0.9; }
+      to { text-shadow: 0 0 50px var(--accent), 0 0 100px var(--accent); opacity: 1; }
+    }
+
+    /* ────────────────────────────────── FOOTER ────────────────────────────────── */
+    .last-updated {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+      margin: 16px 0 10px;
+      opacity: 0.8;
+    }
+
+    footer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    footer a:hover {
+      color: #ccc;
+      text-decoration: underline;
+    }
+
+    /* ────────────────────────────────── HIDDEN UTILS ────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* ────────────────────────────────── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 600px) {
+      #app { padding: 20px; border-radius: 20px; }
+      h1 { font-size: 2rem; }
+      .name { gap: 10px; font-size: 0.92rem; }
+      .avatar { width: 36px; height: 36px; }
+      .table-container { max-height: 62vh; }
+      th, td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STARFALL BACKGROUND -->
+  <div class="stars" id="stars"></div>
+
+  <!-- LOADER -->
+  <div id="loader" tabindex="0" role="button" aria-label="Enter leaderboard">
+    <div id="logo">GOONING</div>
+    <div style="margin-top:18px;color:#999;font-size:1.15rem;">Click or press Enter</div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
+    <h1>Gooning Leaderboard</h1>
+
+    <div id="loading" style="text-align:center;color:#bbb;margin:24px 0;font-size:1rem;">
+      Loading leaderboard...
+    </div>
+
+    <div class="table-container">
+      <table id="board" class="hidden">
+        <thead>
+          <tr>
+            <th style="width:70px">Rank</th>
+            <th>Player</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div class="last-updated" id="updated"></div>
+    <footer>Auto-refreshed • <a href="leaderboard.json" target="_blank">view raw JSON</a></footer>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // ────── STARFALL ANIMATION ──────
+    function createStar() {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 3 + 1;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.left = `${Math.random() * 100}vw`;
+      star.style.top = `-10px`;
+      star.style.animationDuration = `${Math.random() * 8 + 5}s`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      star.style.opacity = Math.random() * 0.6 + 0.3;
+      $('#stars').appendChild(star);
+      setTimeout(() => star.remove(), 15000);
+    }
+
+    // Generate stars continuously
+    setInterval(createStar, 300);
+    for (let i = 0; i < 40; i++) setTimeout(createStar, i * 100);
+
+    // ────── DISCORD PFP HELPER ──────
+    function getDiscordAvatar(userId, avatarHash, size = 80) {
+      if (!userId || !avatarHash) return `https://cdn.discordapp.com/embed/avatars/0.png`;
+      const ext = avatarHash.startsWith('a_') ? 'gif' : 'webp';
+      return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=${size}`;
+    }
+
+    // ────── LOADER ──────
+    function enterLeaderboard() {
+      const loader = $('loader');
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        $('app').classList.remove('hidden');
+        fetchLeaderboard();
+        setInterval(fetchLeaderboard, 90000); // Refresh every 90s
+      }, 1000);
+    }
+
+    $('loader').addEventListener('click', enterLeaderboard);
+    $('loader').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        enterLeaderboard();
+      }
+    });
+    setTimeout(() => $('loader').focus(), 100);
+
+    // ────── FETCH LEADERBOARD ──────
+    async function fetchLeaderboard() {
+      const loading = $('loading');
+      const board = $('board');
+      const rows = $('rows');
+      const updated = $('updated');
+
+      try {
+        const res = await fetch('leaderboard.json?' + Date.now());
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+
+        let list = Array.isArray(data) ? data : (data.leaderboard || []);
+        const time = data.updated || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        // Pad to 100 slots
+        const paddedList = [];
+        for (let i = 0; i < 100; i++) {
+          paddedList.push(list[i] || { rank: i + 1 });
+        }
+
+        rows.innerHTML = paddedList.map((p, idx) => {
+          const hasData = p.name || p.discord;
+          const avatarUrl = getDiscordAvatar(p.discordId, p.avatar);
+          const rank = p.rank || (idx + 1);
+          return `
+            <tr>
+              <td class="rank">${rank}</td>
+              <td class="name">
+                ${hasData ? `
+                <div class="avatar">
+                  <img src="${avatarUrl}"
+                       onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"
+                       alt="${e(p.name || 'User')} avatar">
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:1rem;">${e(p.name || 'Unknown')}</div>
+                  ${p.discord ? `<div class="discord-tag"><i class="fab fa-discord"></i>${e(p.discord)}</div>` : ''}
+                </div>
+                ` : `<div class="empty-slot">— Empty Slot —</div>`}
+              </td>
+            </tr>`;
+        }).join('');
+
+        updated.textContent = `Last updated: ${time}`;
+        loading.classList.add('hidden');
+        board.classList.remove('hidden');
+      } catch (err) {
+        loading.textContent = 'Failed to load leaderboard.';
+        loading.style.color = '#f88';
+      }
+    }
+
+    // ────── ESCAPE HTML ──────
+    function e(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>

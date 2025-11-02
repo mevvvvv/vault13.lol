@@ -1,0 +1,705 @@
+{
+  "updated": "10:45 PM",
+  "leaderboard": [
+    {
+      "rank": 1,
+      "name": "MEV",
+      "discord": ".stoplarping",
+      "discordId": "1268444840983527425",
+      "avatar": "a_7d8f9e1c2b3a4d5e6f7g8h9i0j1k2l3m4"
+    },
+    {
+      "rank": 2,
+      "name": "Leo",
+      "discord": "papa.muffin",
+      "discordId": "1356370565341909053",
+      "avatar": "b1a2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+    },
+    {
+      "rank": 3,
+      "name": "Muffin",
+      "discord": "papa.muffin",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 4,
+      "name": "ZEN Angel",
+      "discord": "angel._.211",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 5,
+      "name": "MAR",
+      "discord": "qzumar",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 6,
+      "name": "T",
+      "discord": "tluvsleeping",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 7,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 8,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 9,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 10,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 11,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 12,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 13,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 14,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 15,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 16,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 17,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 18,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 19,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 20,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 21,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 22,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 23,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 24,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 25,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 26,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 27,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 28,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 29,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 30,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 31,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 32,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 33,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 34,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 35,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 36,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 37,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 38,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 39,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 40,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 41,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 42,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 43,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 44,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 45,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 46,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 47,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 48,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 49,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 50,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 51,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 52,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 53,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 54,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 55,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 56,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 57,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 58,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 59,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 60,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 61,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 62,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 63,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 64,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 65,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 66,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 67,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 68,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 69,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 70,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 71,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 72,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 73,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 74,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 75,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 76,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 77,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 78,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 79,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 80,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 81,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 82,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 83,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 84,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 85,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 86,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 87,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 88,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 89,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 90,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 91,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 92,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 93,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 94,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 95,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 96,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 97,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 98,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 99,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    },
+    {
+      "rank": 100,
+      "name": "",
+      "discord": "",
+      "discordId": "",
+      "avatar": ""
+    }
+  ]
+}

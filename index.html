@@ -1,415 +1,139 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>E Dancing Leaderboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    /* ────────────────────────────────── VARIABLES ────────────────────────────────── */
-    :root {
-      --bg: #050505;
-      --glass: #111111ee;
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text: #f5f5f5;
-      --muted: #aaaaaa;
-      --glow: #ffffff;
-      --accent: #ffffff;
-      --discord: #cccccc;
-      --transition: 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-      --scrollbar: #444;
-      --scrollbar-hover: #666;
-      font-family: 'Inter', system-ui, sans-serif;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<script>
+  const $ = id => document.getElementById(id);
 
-    /* ────────────────────────────────── STARFALL BACKGROUND ────────────────────────────────── */
-    html, body {
-      min-height: 100vh;
-      background: var(--bg);
-      overflow: hidden;
-      color: var(--text);
-      position: relative;
-    }
-    .stars {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .star {
-      position: absolute;
-      background: #fff;
-      border-radius: 50%;
-      opacity: 0;
-      animation: fall linear infinite;
-    }
-    @keyframes fall {
-      0% { transform: translateY(-100px) scale(0.2); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 0.3; }
-      100% { transform: translateY(100vh) scale(0.8); opacity: 0; }
-    }
+  // ────── STARFALL ANIMATION ──────
+  function createStar() {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 3 + 1;
+    star.style.width = star.style.height = `${size}px`;
+    star.style.left = `${Math.random() * 100}vw`;
+    star.style.animationDuration = `${Math.random() * 8 + 5}s`;
+    star.style.animationDelay = `${Math.random() * 5}s`;
+    star.style.opacity = Math.random() * 0.6 + 0.3;
+    $('#stars').appendChild(star);
+    setTimeout(() => star.remove(), 15000);
+  }
+  setInterval(createStar, 300);
+  for (let i = 0; i < 40; i++) setTimeout(createStar, i * 100);
 
-    /* ────────────────────────────────── APP CONTAINER (ZOOMED IN) ────────────────────────────────── */
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-    }
-    #app {
-      max-width: 720px;                 /* ← Smaller width */
-      width: 100%;
-      position: relative;
-      z-index: 1;
-      backdrop-filter: blur(20px);
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 24px 20px;               /* ← Tighter padding */
-      box-shadow:
-        0 14px 50px rgba(0, 0, 0, 0.8),
-        inset 0 0 30px rgba(255, 255, 255, 0.05);
-      transition: all 0.5s var(--transition);
-      transform: scale(1.05);           /* ← "Zoomed-in" feel */
-      transform-origin: center;
-    }
-    #app:hover {
-      transform: scale(1.07) translateY(-6px);
-      box-shadow:
-        0 20px 70px rgba(0, 0, 0, 0.9),
-        0 0 35px rgba(255, 255, 255, 0.12);
-    }
+  // ────── SOUND PLAYER ──────
+  function playEntrySound() {
+    const audio = new Audio('https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3');
+    audio.volume = 0.7;
+    audio.play().catch(e => console.log('Audio play failed:', e));
+  }
 
-    /* ────────────────────────────────── TITLE ────────────────────────────────── */
-    h1 {
-      text-align: center;
-      font-weight: 800;
-      font-size: 2rem;                  /* ← Smaller title */
-      letter-spacing: 1.8px;
-      background: linear-gradient(90deg, #fff, #ccc);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-      margin-bottom: 18px;
-      animation: titleGlow 3s ease-in-out infinite alternate;
+  // ────── DISCORD PFP FROM ID ONLY (NO AVATAR HASH) ──────
+  function getDiscordAvatar(discordId, size = 80) {
+    if (!discordId || isNaN(discordId)) {
+      return `https://cdn.discordapp.com/embed/avatars/0.png`;
     }
-    @keyframes titleGlow {
-      from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
-      to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.2); }
-    }
+    // Discord default avatars cycle 0–5 based on ID % 6
+    return `https://cdn.discordapp.com/embed/avatars/${Number(discordId) % 6}.png`;
+  }
 
-    /* ────────────────────────────────── TABLE CONTAINER ────────────────────────────────── */
-    .table-container {
-      max-height: 62vh;                 /* ← Less vertical space */
-      overflow-y: auto;
-      border-radius: 14px;
-      margin-top: 12px;
-      border: 1px solid var(--glass-border);
-      background: rgba(0, 0, 0, 0.2);
-      box-shadow: inset 0 5px 12px rgba(0, 0, 0, 0.4);
-      scrollbar-width: thin;
-      scrollbar-color: var(--scrollbar) transparent;
+  // ────── LOADER ──────
+  function enterLeaderboard() {
+    playEntrySound();
+    const loader = $('loader');
+    loader.style.opacity = '0';
+    setTimeout(() => {
+      loader.classList.add('hidden');
+      $('app').classList.remove('hidden');
+      fetchLeaderboard();
+      setInterval(fetchLeaderboard, 90000);
+    }, 1000);
+  }
+  $('loader').addEventListener('click', enterLeaderboard);
+  $('loader').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      enterLeaderboard();
     }
-    .table-container::-webkit-scrollbar { width: 9px; }
-    .table-container::-webkit-scrollbar-track { background: transparent; }
-    .table-container::-webkit-scrollbar-thumb {
-      background: var(--scrollbar);
-      border-radius: 5px;
-      border: 2px solid transparent;
-      background-clip: content-box;
-    }
-    .table-container::-webkit-scrollbar-thumb:hover {
-      background: var(--scrollbar-hover);
-      background-clip: content-box;
-    }
+  });
+  setTimeout(() => $('loader').focus(), 100);
 
-    /* ────────────────────────────────── TABLE ────────────────────────────────── */
-    table { width: 100%; border-collapse: collapse; background: transparent; }
-    thead {
-      position: sticky; top: 0; z-index: 10;
-      background: linear-gradient(180deg, rgba(25,25,25,.98), rgba(15,15,15,.95));
-      backdrop-filter: blur(12px);
-      text-transform: uppercase;
-      font-size: .7rem; letter-spacing: 1.5px;
-      color: var(--muted); border-bottom: 1px solid var(--glass-border);
-    }
-    th, td { padding: 11px 13px; transition: all .3s var(--transition); }
-    tr { transition: all .4s var(--transition); }
-    tr:hover {
-      background: rgba(255,255,255,.09);
-      transform: translateX(5px);
-      box-shadow: 0 7px 18px rgba(255,255,255,.08);
-    }
+  // ────── FETCH LEADERBOARD (FROM JSON FILE) ──────
+  async function fetchLeaderboard() {
+    const loading = $('loading');
+    const board = $('board');
+    const rows = $('rows');
+    const updated = $('updated');
+    try {
+      const res = await fetch('leaderboard.json?' + Date.now());
+      if (!res.ok) throw new Error('Not found');
+      const data = await res.json();
+      let list = Array.isArray(data) ? data : (data.leaderboard || []);
+      const time = data.updated || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    .rank {
-      font-weight: 800; color: var(--accent); font-size: 1.2rem;
-      text-align: center; text-shadow: 0 0 9px rgba(255,255,255,.4);
-    }
-    .rank:nth-of-type(1) { color: #ffd700; font-size: 1.35rem; text-shadow: 0 0 18px #ffd700; }
-    .rank:nth-of-type(2) { color: #c0c0c0; font-size: 1.3rem; text-shadow: 0 0 16px #c0c0c0; }
-    .rank:nth-of-type(3) { color: #cd7f32; font-size: 1.28rem; text-shadow: 0 0 14px #cd7f32; }
+      const paddedList = [];
+      for (let i = 0; i < 100; i++) {
+        paddedList.push(list[i] || { rank: i + 1 });
+      }
 
-    .name { display: flex; align-items: center; gap: 12px; font-size: .94rem; }
-    .avatar {
-      width: 36px; height: 36px; border-radius: 10px; overflow: hidden;
-      box-shadow: 0 0 14px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.15);
-      flex-shrink: 0; transition: transform .3s ease;
-    }
-    tr:hover .avatar { transform: scale(1.1) rotate(5deg); }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+      rows.innerHTML = paddedList.map((p, idx) => {
+        const hasData = p.name || p.discord || p.discordId;
+        const discordId = p.discordId;
+        const avatarUrl = getDiscordAvatar(discordId);
+        const rank = p.rank || (idx + 1);
 
-    .discord-tag {
-      display: flex; align-items: center; gap: 6px; font-size: .78rem;
-      color: var(--discord); font-weight: 500; opacity: .9; margin-top: 2px;
-    }
-    .discord-tag i { filter: drop-shadow(0 0 5px #5865f2); animation: discordPulse 2.5s infinite alternate; }
-    @keyframes discordPulse {
-      from { filter: drop-shadow(0 0 5px #5865f2); }
-      to { filter: drop-shadow(0 0 12px #5865f2); }
-    }
-
-    .empty-slot { color: #666; font-style: italic; font-size: .92rem; }
-
-    /* ────────────────────────────────── LOADER ────────────────────────────────── */
-    #loader {
-      position: fixed; inset: 0; background: var(--bg);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 1s ease; z-index: 100; cursor: pointer;
-    }
-    #logo {
-      font-size: 3.2rem; font-weight: 900; text-transform: uppercase;
-      color: var(--accent); letter-spacing: 4.5px;
-      background: linear-gradient(45deg, #fff, #aaa);
-      background-clip: text; -webkit-background-clip: text; color: transparent;
-      animation: glow 2.5s ease-in-out infinite alternate;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); opacity: .9; }
-      to { text-shadow: 0 0 50px var(--accent), 0 0 100px var(--accent); opacity: 1; }
-    }
-
-    /* ────────────────────────────────── FOOTER ────────────────────────────────── */
-    .last-updated {
-      font-size: .76rem; color: var(--muted); text-align: center;
-      margin: 14px 0 8px; opacity: .8;
-    }
-    footer {
-      margin-top: 8px; text-align: center; font-size: .74rem; color: var(--muted);
-    }
-    footer a { color: var(--muted); text-decoration: none; transition: .2s; }
-    footer a:hover { color: #ccc; text-decoration: underline; }
-
-    /* Subtle credit */
-    .credit {
-      font-size: .68rem;
-      color: #777;
-      margin-top: 6px;
-      opacity: .6;
-      font-style: italic;
-    }
-
-    /* ────────────────────────────────── HIDDEN ────────────────────────────────── */
-    .hidden { display: none !important; }
-
-    /* ────────────────────────────────── RESPONSIVE ────────────────────────────────── */
-    @media (max-width: 600px) {
-      #app { padding: 18px; border-radius: 18px; }
-      h1 { font-size: 1.8rem; }
-      .name { gap: 10px; font-size: .9rem; }
-      .avatar { width: 32px; height: 32px; }
-      .table-container { max-height: 58vh; }
-      th, td { padding: 9px 10px; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- STARFALL BACKGROUND -->
-  <div class="stars" id="stars"></div>
-
-  <!-- LOADER -->
-  <div id="loader" tabindex="0" role="button" aria-label="Enter leaderboard">
-    <div id="logo">E Dancing Leaderboard</div>
-    <div style="margin-top:18px;color:#999;font-size:1.15rem;">Click or press Enter</div>
-  </div>
-
-  <!-- MAIN APP -->
-  <div id="app" class="hidden">
-    <h1>E Dancing Leaderboard</h1>
-
-    <div id="loading" style="text-align:center;color:#bbb;margin:20px 0;font-size:.96rem;">
-      Loading leaderboard...
-    </div>
-
-    <div class="table-container">
-      <table id="board" class="hidden">
-        <thead>
+        return `
           <tr>
-            <th style="width:60px">Rank</th>
-            <th>Player</th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
+            <td class="rank">${rank}</td>
+            <td class="name">
+              ${hasData ? `
+              <div class="avatar">
+                <img src="${avatarUrl}"
+                     alt="${e(p.name || 'User')} avatar">
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:.98rem;">${e(p.name || 'Unknown')}</div>
+                ${p.discord ? `<div class="discord-tag"><i class="fab fa-discord"></i>${e(p.discord)}</div>` : ''}
+              </div>
+              ` : `<div class="empty-slot">— Empty Slot —</div>`}
+            </td>
+          </tr>`;
+      }).join('');
 
-    <div class="last-updated" id="updated"></div>
-
-    <footer>
-      Auto-refreshed • <a href="leaderboard.json" target="_blank">view raw JSON</a>
-      <div class="credit">Site made by mev/vsqz</div>
-    </footer>
-  </div>
-
-  <script>
-    const $ = id => document.getElementById(id);
-
-    // ────── STARFALL ANIMATION ──────
-    function createStar() {
-      const star = document.createElement('div');
-      star.className = 'star';
-      const size = Math.random() * 3 + 1;
-      star.style.width = star.style.height = `${size}px`;
-      star.style.left = `${Math.random() * 100}vw`;
-      star.style.animationDuration = `${Math.random() * 8 + 5}s`;
-      star.style.animationDelay = `${Math.random() * 5}s`;
-      star.style.opacity = Math.random() * 0.6 + 0.3;
-      $('#stars').appendChild(star);
-      setTimeout(() => star.remove(), 15000);
+      updated.textContent = `Last updated: ${time}`;
+      loading.classList.add('hidden');
+      board.classList.remove('hidden');
+    } catch (err) {
+      loading.textContent = 'Failed to load leaderboard.json';
+      loading.style.color = '#f88';
     }
-    setInterval(createStar, 300);
-    for (let i = 0; i < 40; i++) setTimeout(createStar, i * 100);
+  }
 
-    // ────── SOUND PLAYER ──────
-    function playEntrySound() {
-      const audio = new Audio('https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3');
-      audio.volume = 0.7;
-      audio.play().catch(e => {
-        console.log('Audio play failed:', e);
-      });
-    }
+  // ────── ESCAPE HTML ──────
+  function e(t) {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+  }
 
-    // ────── DISCORD PFP HELPER ──────
-    function getDiscordAvatar(userId, avatarHash, size = 80) {
-      if (!userId || !avatarHash) return `https://cdn.discordapp.com/embed/avatars/${userId % 6}.png`;
-      const ext = avatarHash.startsWith('a_') ? 'gif' : 'webp';
-      return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=${size}`;
-    }
+  // ────── DEMO MODE (LOCAL ONLY) ──────
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.location.protocol === 'file:') {
+      const sampleData = {
+        leaderboard: [
+          { rank: 1, name: "Electro Queen", discord: "electroqueen#1234", discordId: "123456789012345678" },
+          { rank: 2, name: "Beat Master", discord: "beatmaster#5678", discordId: "987654321098765432" },
+          { rank: 3, name: "Rhythm Rebel", discord: "rhythmrebel#9012", discordId: "456789123456789123" }
+        ],
+        updated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
 
-    // ────── LOADER ──────
-    function enterLeaderboard() {
-      // Play the sound immediately when entering
-      playEntrySound();
-      
-      const loader = $('loader');
-      loader.style.opacity = '0';
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        $('app').classList.remove('hidden');
-        fetchLeaderboard();
-        setInterval(fetchLeaderboard, 90000);
-      }, 1000);
-    }
-    $('loader').addEventListener('click', enterLeaderboard);
-    $('loader').addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        enterLeaderboard();
-      }
-    });
-    setTimeout(() => $('loader').focus(), 100);
-
-    // ────── FETCH LEADERBOARD ──────
-    async function fetchLeaderboard() {
-      const loading = $('loading');
-      const board = $('board');
-      const rows = $('rows');
-      const updated = $('updated');
-      try {
-        const res = await fetch('leaderboard.json?' + Date.now());
-        if (!res.ok) throw new Error('Not found');
-        const data = await res.json();
-        let list = Array.isArray(data) ? data : (data.leaderboard || []);
-        const time = data.updated || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const paddedList = [];
-        for (let i = 0; i < 100; i++) {
-          paddedList.push(list[i] || { rank: i + 1 });
+      const originalFetch = window.fetch;
+      window.fetch = function(url) {
+        if (url.includes('leaderboard.json')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(sampleData)
+          });
         }
-
-        rows.innerHTML = paddedList.map((p, idx) => {
-          const hasData = p.name || p.discord;
-          const avatarUrl = getDiscordAvatar(p.discordId, p.avatar);
-          const rank = p.rank || (idx + 1);
-          return `
-            <tr>
-              <td class="rank">${rank}</td>
-              <td class="name">
-                ${hasData ? `
-                <div class="avatar">
-                  <img src="${avatarUrl}"
-                       onerror="this.src='https://cdn.discordapp.com/embed/avatars/${(p.discordId || idx) % 6}.png'"
-                       alt="${e(p.name || 'User')} avatar">
-                </div>
-                <div>
-                  <div style="font-weight:600;font-size:.98rem;">${e(p.name || 'Unknown')}</div>
-                  ${p.discord ? `<div class="discord-tag"><i class="fab fa-discord"></i>${e(p.discord)}</div>` : ''}
-                </div>
-                ` : `<div class="empty-slot">— Empty Slot —</div>`}
-              </td>
-            </tr>`;
-        }).join('');
-
-        updated.textContent = `Last updated: ${time}`;
-        loading.classList.add('hidden');
-        board.classList.remove('hidden');
-      } catch (err) {
-        loading.textContent = 'Failed to load leaderboard.';
-        loading.style.color = '#f88';
-      }
+        return originalFetch.apply(this, arguments);
+      };
     }
-
-    // ────── ESCAPE HTML ──────
-    function e(t) {
-      const d = document.createElement('div');
-      d.textContent = t;
-      return d.innerHTML;
-    }
-
-    // ────── SAMPLE DATA FOR DEMO (remove this in production) ──────
-    // This creates a mock leaderboard.json if it doesn't exist
-    window.addEventListener('DOMContentLoaded', () => {
-      // Only create sample data if we're running locally and no real data exists
-      if (window.location.protocol === 'file:') {
-        const sampleData = {
-          leaderboard: [
-            { rank: 1, name: "Electro Queen", discord: "electroqueen#1234", discordId: "123456789", avatar: "a_abc123def456" },
-            { rank: 2, name: "Beat Master", discord: "beatmaster#5678", discordId: "987654321", avatar: "b_xyz789uvw012" },
-            { rank: 3, name: "Rhythm Rebel", discord: "rhythmrebel#9012", discordId: "456789123", avatar: "c_def345ghi678" },
-            { rank: 4, name: "Groove Guru", discord: "grooveguru#3456", discordId: "789123456", avatar: "d_jkl901mno234" },
-            { rank: 5, name: "Bass Babe", discord: "bassbabe#7890", discordId: "321654987", avatar: "e_pqr567stu890" }
-          ],
-          updated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        
-        // Mock the fetch function for demo purposes
-        const originalFetch = window.fetch;
-        window.fetch = function(url) {
-          if (url.includes('leaderboard.json')) {
-            return Promise.resolve({
-              ok: true,
-              json: () => Promise.resolve(sampleData)
-            });
-          }
-          return originalFetch.apply(this, arguments);
-        };
-      }
-    });
-  </script>
-</body>
-</html>
+  });
+</script>

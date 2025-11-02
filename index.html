@@ -1,139 +1,240 @@
-<script>
-  const $ = id => document.getElementById(id);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mev/vsqz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap');
 
-  // ────── STARFALL ANIMATION ──────
-  function createStar() {
-    const star = document.createElement('div');
-    star.className = 'star';
-    const size = Math.random() * 3 + 1;
-    star.style.width = star.style.height = `${size}px`;
-    star.style.left = `${Math.random() * 100}vw`;
-    star.style.animationDuration = `${Math.random() * 8 + 5}s`;
-    star.style.animationDelay = `${Math.random() * 5}s`;
-    star.style.opacity = Math.random() * 0.6 + 0.3;
-    $('#stars').appendChild(star);
-    setTimeout(() => star.remove(), 15000);
-  }
-  setInterval(createStar, 300);
-  for (let i = 0; i < 40; i++) setTimeout(createStar, i * 100);
-
-  // ────── SOUND PLAYER ──────
-  function playEntrySound() {
-    const audio = new Audio('https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3');
-    audio.volume = 0.7;
-    audio.play().catch(e => console.log('Audio play failed:', e));
-  }
-
-  // ────── DISCORD PFP FROM ID ONLY (NO AVATAR HASH) ──────
-  function getDiscordAvatar(discordId, size = 80) {
-    if (!discordId || isNaN(discordId)) {
-      return `https://cdn.discordapp.com/embed/avatars/0.png`;
-    }
-    // Discord default avatars cycle 0–5 based on ID % 6
-    return `https://cdn.discordapp.com/embed/avatars/${Number(discordId) % 6}.png`;
-  }
-
-  // ────── LOADER ──────
-  function enterLeaderboard() {
-    playEntrySound();
-    const loader = $('loader');
-    loader.style.opacity = '0';
-    setTimeout(() => {
-      loader.classList.add('hidden');
-      $('app').classList.remove('hidden');
-      fetchLeaderboard();
-      setInterval(fetchLeaderboard, 90000);
-    }, 1000);
-  }
-  $('loader').addEventListener('click', enterLeaderboard);
-  $('loader').addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      enterLeaderboard();
-    }
-  });
-  setTimeout(() => $('loader').focus(), 100);
-
-  // ────── FETCH LEADERBOARD (FROM JSON FILE) ──────
-  async function fetchLeaderboard() {
-    const loading = $('loading');
-    const board = $('board');
-    const rows = $('rows');
-    const updated = $('updated');
-    try {
-      const res = await fetch('leaderboard.json?' + Date.now());
-      if (!res.ok) throw new Error('Not found');
-      const data = await res.json();
-      let list = Array.isArray(data) ? data : (data.leaderboard || []);
-      const time = data.updated || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const paddedList = [];
-      for (let i = 0; i < 100; i++) {
-        paddedList.push(list[i] || { rank: i + 1 });
-      }
-
-      rows.innerHTML = paddedList.map((p, idx) => {
-        const hasData = p.name || p.discord || p.discordId;
-        const discordId = p.discordId;
-        const avatarUrl = getDiscordAvatar(discordId);
-        const rank = p.rank || (idx + 1);
-
-        return `
-          <tr>
-            <td class="rank">${rank}</td>
-            <td class="name">
-              ${hasData ? `
-              <div class="avatar">
-                <img src="${avatarUrl}"
-                     alt="${e(p.name || 'User')} avatar">
-              </div>
-              <div>
-                <div style="font-weight:600;font-size:.98rem;">${e(p.name || 'Unknown')}</div>
-                ${p.discord ? `<div class="discord-tag"><i class="fab fa-discord"></i>${e(p.discord)}</div>` : ''}
-              </div>
-              ` : `<div class="empty-slot">— Empty Slot —</div>`}
-            </td>
-          </tr>`;
-      }).join('');
-
-      updated.textContent = `Last updated: ${time}`;
-      loading.classList.add('hidden');
-      board.classList.remove('hidden');
-    } catch (err) {
-      loading.textContent = 'Failed to load leaderboard.json';
-      loading.style.color = '#f88';
-    }
-  }
-
-  // ────── ESCAPE HTML ──────
-  function e(t) {
-    const d = document.createElement('div');
-    d.textContent = t;
-    return d.innerHTML;
-  }
-
-  // ────── DEMO MODE (LOCAL ONLY) ──────
-  window.addEventListener('DOMContentLoaded', () => {
-    if (window.location.protocol === 'file:') {
-      const sampleData = {
-        leaderboard: [
-          { rank: 1, name: "Electro Queen", discord: "electroqueen#1234", discordId: "123456789012345678" },
-          { rank: 2, name: "Beat Master", discord: "beatmaster#5678", discordId: "987654321098765432" },
-          { rank: 3, name: "Rhythm Rebel", discord: "rhythmrebel#9012", discordId: "456789123456789123" }
-        ],
-        updated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      const originalFetch = window.fetch;
-      window.fetch = function(url) {
-        if (url.includes('leaderboard.json')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(sampleData)
-          });
+        :root {
+            --p: #9d4edd;
+            --bg: #000;
         }
-        return originalFetch.apply(this, arguments);
-      };
-    }
-  });
-</script>
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; background: var(--bg); }
+
+        /* Full GIF Background */
+        .bg-gif {
+            position: fixed;
+            top: 50%; left: 50%;
+            min-width: 100%; min-height: 100%;
+            width: auto; height: auto;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            object-fit: cover;
+            filter: brightness(0.85) contrast(1.15);
+        }
+
+        /* Landing */
+        #landing {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 15px var(--p), 0 0 30px var(--p);
+            letter-spacing: 0.15em;
+            margin-bottom: 0.8rem;
+        }
+
+        .enter {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--p);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 500;
+            text-shadow: 0 0 10px var(--p);
+        }
+
+        /* Glitch Out */
+        #landing.out {
+            animation: glitchFade 1.4s forwards;
+            pointer-events: none;
+        }
+        @keyframes glitchFade {
+            0% { opacity: 1; filter: blur(0); }
+            50% { opacity: 0.7; filter: blur(2px); transform: scale(1.02); }
+            100% { opacity: 0; filter: blur(8px); transform: scale(1.05); }
+        }
+
+        /* Advanced Center Frame */
+        #frame {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 460px;
+            background: rgba(8, 8, 12, 0.92);
+            border: 1.5px solid var(--p);
+            border-radius: 14px;
+            padding: 2rem 1.8rem;
+            text-align: center;
+            box-shadow: 
+                0 0 40px rgba(157, 78, 221, 0.6),
+                inset 0 0 20px rgba(157, 78, 221, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #frame.in {
+            opacity: 1;
+            pointer-events: all;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .pfp-ring {
+            position: relative;
+            width: 110px; height: 110px;
+            margin: 0 auto 1.2rem;
+        }
+        .pfp {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px var(--p);
+        }
+        .ring-glow {
+            position: absolute;
+            top: -8px; left: -8px;
+            width: 126px; height: 126px;
+            border: 2px solid var(--p);
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: pulseRing 3s infinite;
+        }
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 0.4; }
+        }
+
+        .name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--p);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px var(--p);
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .link {
+            background: rgba(157, 78, 221, 0.12);
+            border: 1px solid var(--p);
+            border-radius: 10px;
+            padding: 0.85rem;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .link::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: 0.5s;
+        }
+        .link:hover::before { left: 100%; }
+        .link:hover {
+            background: rgba(157, 78, 221, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(157, 78, 221, 0.3);
+        }
+        .link img {
+            width: 18px; height: 18px;
+            margin-right: 8px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* Audio */
+        #sfx { display: none; }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .title { font-size: 2.2rem; }
+            .enter { font-size: 0.85rem; }
+            #frame { padding: 1.6rem 1.4rem; max-width: 92%; }
+            .pfp-ring { width: 90px; height: 90px; }
+            .ring-glow { width: 106px; height: 106px; top: -8px; left: -8px; }
+            .name { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background GIF -->
+    <img src="https://tenor.com/view/squeezebenz-wheres981-squeeze-benz-slobenz-nohesi-gif-11039802729463150707" class="bg-gif" alt="bg">
+
+    <!-- Landing -->
+    <div id="landing" onclick="enter()">
+        <div class="title">mev/vsqz</div>
+        <div class="enter">click to enter hell</div>
+    </div>
+
+    <!-- Audio -->
+    <audio id="sfx" src="https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3"></audio>
+
+    <!-- Advanced Frame -->
+    <div id="frame">
+        <div class="pfp-ring">
+            <div class="ring-glow"></div>
+            <!-- CHANGE PFP -->
+            <img src="https://via.placeholder.com/110/111/fff?text=mev" alt="pfp" class="pfp">
+        </div>
+        <div class="name">mev/vsqz</div>
+        <div class="links">
+            <!-- EDIT LINKS -->
+            <a href="#" class="link"><img src="https://cdn.simpleicons.org/discord/white"> Discord</a>
+            <a href="#" class="link"><img src="https://cdn.simpleicons.org/roblox/white"> Roblox</a>
+            <a href="https://github.com/mevvvvv" class="link"><img src="https://cdn.simpleicons.org/github/white"> GitHub</a>
+        </div>
+    </div>
+
+    <script>
+        function enter() {
+            const land = document.getElementById('landing');
+            const frame = document.getElementById('frame');
+            const audio = document.getElementById('sfx');
+
+            audio.play().catch(() => {});
+            land.classList.add('out');
+
+            setTimeout(() => {
+                land.style.display = 'none';
+                frame.classList.add('in');
+            }, 1400);
+        }
+    </script>
+
+</body>
+</html>

@@ -292,7 +292,6 @@
 
     <script>
         const audio = document.getElementById('hellsong');
-        const playPause = document.getElementById('playPause');
         const progress = document.getElementById('progress');
         const frame = document.getElementById('frame');
         const player = document.getElementById('audio-player');
@@ -309,19 +308,7 @@
                 document.getElementById('landing').style.display = 'none';
                 frame.classList.add('in');
                 player.classList.add('show');
-                updatePlayPause();
             }, 1400);
-        }
-
-        // Toggle Play/Pause
-        playPause.onclick = () => {
-            if (audio.paused) audio.play();
-            else audio.pause();
-            updatePlayPause();
-        };
-
-        function updatePlayPause() {
-            playPause.textContent = audio.paused ? '▶' : '❚❚';
         }
 
         // Progress bar (visual only)

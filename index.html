@@ -1,496 +1,373 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E Dancing Leaderboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: #0a0a0a;
-            color: #fff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: pointer;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* Entrance Screen Styles */
-        #entrance-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, #1a0a2a 0%, #0a0a0a 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transition: opacity 0.8s ease;
-        }
-        
-        .title {
-            font-size: 72px;
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px #8a2be2, 0 0 40px #9370db;
-            background: linear-gradient(45deg, #8a2be2, #9370db, #da70d6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            font-size: 20px;
-            text-align: center;
-            max-width: 600px;
-            margin-bottom: 30px;
-            opacity: 0.8;
-            color: #c0a9e6;
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .click-instruction {
-            position: absolute;
-            bottom: 50px;
-            font-size: 18px;
-            color: #9370db;
-            opacity: 0.7;
-            animation: fadeInOut 3s infinite;
-        }
-        
-        @keyframes fadeInOut {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
-        }
-        
-        /* Leaderboard Styles */
-        #leaderboard {
-            display: none;
-            padding-top: 40px;
-        }
-        
-        .leaderboard-title {
-            font-size: 48px;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 15px #8a2be2;
-            background: linear-gradient(45deg, #8a2be2, #9370db);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-        }
-        
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 40px;
-            background: rgba(26, 10, 42, 0.7);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
-            border: 1px solid #2a0a4a;
-        }
-        
-        .leaderboard-table th {
-            background: linear-gradient(45deg, #4b0082, #8a2be2);
-            padding: 20px;
-            text-align: left;
-            font-size: 18px;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .leaderboard-table td {
-            padding: 15px 20px;
-            border-bottom: 1px solid #2a0a4a;
-        }
-        
-        .leaderboard-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .leaderboard-table tr:hover {
-            background: rgba(138, 43, 226, 0.1);
-        }
-        
-        .rank {
-            font-weight: bold;
-            font-size: 20px;
-            text-align: center;
-            width: 80px;
-        }
-        
-        .rank-1 {
-            color: gold;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-        }
-        
-        .rank-2 {
-            color: silver;
-            text-shadow: 0 0 10px rgba(192, 192, 192, 0.7);
-        }
-        
-        .rank-3 {
-            color: #cd7f32;
-            text-shadow: 0 0 10px rgba(205, 127, 50, 0.7);
-        }
-        
-        .player-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .player-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 15px;
-            border: 2px solid #8a2be2;
-            box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
-        }
-        
-        .player-name {
-            font-weight: 600;
-            font-size: 18px;
-        }
-        
-        .score {
-            font-weight: bold;
-            color: #da70d6;
-            font-size: 18px;
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-        
-        .stat-card {
-            background: rgba(26, 10, 42, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            width: 200px;
-            text-align: center;
-            margin: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a0a4a;
-        }
-        
-        .stat-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #9370db;
-            margin: 10px 0;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.8;
-            color: #c0a9e6;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            opacity: 0.7;
-            font-size: 14px;
-            color: #9370db;
-        }
-        
-        .search-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-        
-        .search-box {
-            display: flex;
-            background: rgba(26, 10, 42, 0.7);
-            border-radius: 50px;
-            padding: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a0a4a;
-        }
-        
-        .search-input {
-            background: transparent;
-            border: none;
-            padding: 15px 20px;
-            color: white;
-            font-size: 16px;
-            width: 300px;
-            outline: none;
-        }
-        
-        .search-button {
-            background: linear-gradient(45deg, #8a2be2, #9370db);
-            border: none;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .search-button:hover {
-            background: linear-gradient(45deg, #9370db, #8a2be2);
-            transform: translateY(-2px);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .title {
-                font-size: 48px;
-            }
-            
-            .leaderboard-title {
-                font-size: 36px;
-            }
-            
-            .leaderboard-table th, 
-            .leaderboard-table td {
-                padding: 10px 15px;
-            }
-            
-            .player-avatar {
-                width: 40px;
-                height: 40px;
-            }
-        }
-        
-        /* Glow effect for top players */
-        .top-player {
-            position: relative;
-        }
-        
-        .top-player::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(138, 43, 226, 0.1), transparent);
-            z-index: -1;
-            border-radius: 10px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>E Dancing Leaderboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    /* ────────────────────────────────── VARIABLES ────────────────────────────────── */
+    :root {
+      --bg: #050505;
+      --glass: #111111ee;
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text: #f5f5f5;
+      --muted: #aaaaaa;
+      --glow: #ffffff;
+      --accent: #ffffff;
+      --discord: #cccccc;
+      --transition: 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --scrollbar: #444;
+      --scrollbar-hover: #666;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ────────────────────────────────── STARFALL BACKGROUND ────────────────────────────────── */
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      overflow: hidden;
+      color: var(--text);
+      position: relative;
+    }
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-100px) scale(0.2); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+    }
+
+    /* ────────────────────────────────── APP CONTAINER (ZOOMED IN) ────────────────────────────────── */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    #app {
+      max-width: 720px;                 /* ← Smaller width */
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(20px);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px 20px;               /* ← Tighter padding */
+      box-shadow:
+        0 14px 50px rgba(0, 0, 0, 0.8),
+        inset 0 0 30px rgba(255, 255, 255, 0.05);
+      transition: all 0.5s var(--transition);
+      transform: scale(1.05);           /* ← "Zoomed-in" feel */
+      transform-origin: center;
+    }
+    #app:hover {
+      transform: scale(1.07) translateY(-6px);
+      box-shadow:
+        0 20px 70px rgba(0, 0, 0, 0.9),
+        0 0 35px rgba(255, 255, 255, 0.12);
+    }
+
+    /* ────────────────────────────────── TITLE ────────────────────────────────── */
+    h1 {
+      text-align: center;
+      font-weight: 800;
+      font-size: 2rem;                  /* ← Smaller title */
+      letter-spacing: 1.8px;
+      background: linear-gradient(90deg, #fff, #ccc);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+      margin-bottom: 18px;
+      animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes titleGlow {
+      from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+      to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.2); }
+    }
+
+    /* ────────────────────────────────── TABLE CONTAINER ────────────────────────────────── */
+    .table-container {
+      max-height: 62vh;                 /* ← Less vertical space */
+      overflow-y: auto;
+      border-radius: 14px;
+      margin-top: 12px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 5px 12px rgba(0, 0, 0, 0.4);
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar) transparent;
+    }
+    .table-container::-webkit-scrollbar { width: 9px; }
+    .table-container::-webkit-scrollbar-track { background: transparent; }
+    .table-container::-webkit-scrollbar-thumb {
+      background: var(--scrollbar);
+      border-radius: 5px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-hover);
+      background-clip: content-box;
+    }
+
+    /* ────────────────────────────────── TABLE ────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; background: transparent; }
+    thead {
+      position: sticky; top: 0; z-index: 10;
+      background: linear-gradient(180deg, rgba(25,25,25,.98), rgba(15,15,15,.95));
+      backdrop-filter: blur(12px);
+      text-transform: uppercase;
+      font-size: .7rem; letter-spacing: 1.5px;
+      color: var(--muted); border-bottom: 1px solid var(--glass-border);
+    }
+    th, td { padding: 11px 13px; transition: all .3s var(--transition); }
+    tr { transition: all .4s var(--transition); }
+    tr:hover {
+      background: rgba(255,255,255,.09);
+      transform: translateX(5px);
+      box-shadow: 0 7px 18px rgba(255,255,255,.08);
+    }
+
+    .rank {
+      font-weight: 800; color: var(--accent); font-size: 1.2rem;
+      text-align: center; text-shadow: 0 0 9px rgba(255,255,255,.4);
+    }
+    .rank:nth-of-type(1) { color: #ffd700; font-size: 1.35rem; text-shadow: 0 0 18px #ffd700; }
+    .rank:nth-of-type(2) { color: #c0c0c0; font-size: 1.3rem; text-shadow: 0 0 16px #c0c0c0; }
+    .rank:nth-of-type(3) { color: #cd7f32; font-size: 1.28rem; text-shadow: 0 0 14px #cd7f32; }
+
+    .name { display: flex; align-items: center; gap: 12px; font-size: .94rem; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 0 14px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.15);
+      flex-shrink: 0; transition: transform .3s ease;
+    }
+    tr:hover .avatar { transform: scale(1.1) rotate(5deg); }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .discord-tag {
+      display: flex; align-items: center; gap: 6px; font-size: .78rem;
+      color: var(--discord); font-weight: 500; opacity: .9; margin-top: 2px;
+    }
+    .discord-tag i { filter: drop-shadow(0 0 5px #5865f2); animation: discordPulse 2.5s infinite alternate; }
+    @keyframes discordPulse {
+      from { filter: drop-shadow(0 0 5px #5865f2); }
+      to { filter: drop-shadow(0 0 12px #5865f2); }
+    }
+
+    .empty-slot { color: #666; font-style: italic; font-size: .92rem; }
+
+    /* ────────────────────────────────── LOADER ────────────────────────────────── */
+    #loader {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 1s ease; z-index: 100; cursor: pointer;
+    }
+    #logo {
+      font-size: 3.2rem; font-weight: 900; text-transform: uppercase;
+      color: var(--accent); letter-spacing: 4.5px;
+      background: linear-gradient(45deg, #fff, #aaa);
+      background-clip: text; -webkit-background-clip: text; color: transparent;
+      animation: glow 2.5s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); opacity: .9; }
+      to { text-shadow: 0 0 50px var(--accent), 0 0 100px var(--accent); opacity: 1; }
+    }
+
+    /* ────────────────────────────────── FOOTER ────────────────────────────────── */
+    .last-updated {
+      font-size: .76rem; color: var(--muted); text-align: center;
+      margin: 14px 0 8px; opacity: .8;
+    }
+    footer {
+      margin-top: 8px; text-align: center; font-size: .74rem; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; transition: .2s; }
+    footer a:hover { color: #ccc; text-decoration: underline; }
+
+    /* Subtle credit */
+    .credit {
+      font-size: .68rem;
+      color: #777;
+      margin-top: 6px;
+      opacity: .6;
+      font-style: italic;
+    }
+
+    /* ────────────────────────────────── HIDDEN ────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* ────────────────────────────────── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 600px) {
+      #app { padding: 18px; border-radius: 18px; }
+      h1 { font-size: 1.8rem; }
+      .name { gap: 10px; font-size: .9rem; }
+      .avatar { width: 32px; height: 32px; }
+      .table-container { max-height: 58vh; }
+      th, td { padding: 9px 10px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Entrance Screen -->
-    <div id="entrance-screen">
-        <h1 class="title pulse">E Dancing LeaderBoard</h1>
-        <p class="subtitle">Click anywhere to enter the ultimate E dancing competition</p>
-        <div class="click-instruction">Click anywhere to continue</div>
-    </div>
-    
-    <!-- Leaderboard Content -->
-    <div id="leaderboard" class="container">
-        <h1 class="leaderboard-title">E Dancing Leaderboard</h1>
-        
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="user-search" class="search-input" placeholder="Enter Discord User ID...">
-                <button id="search-button" class="search-button">Search Player</button>
-            </div>
-        </div>
-        
-        <table class="leaderboard-table">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Player</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-                <!-- Leaderboard data will be populated here -->
-            </tbody>
-        </table>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-label">Total Dancers</div>
-                <div class="stat-value">312</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Active Competitions</div>
-                <div class="stat-value">8</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Top Score</div>
-                <div class="stat-value">12,450</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Days Until Reset</div>
-                <div class="stat-value">14</div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            E Dancing Leaderboard &copy; 2023 | Updated in real-time
-        </div>
-    </div>
-    
-    <script>
-        // Sample leaderboard data
-        const leaderboardData = [
-            { id: "123456789", name: "Electro Queen", score: 12450 },
-            { id: "987654321", name: "Beat Master", score: 11870 },
-            { id: "456789123", name: "Rhythm Rebel", score: 11560 },
-            { id: "789123456", name: "Groove Guru", score: 10980 },
-            { id: "321654987", name: "Bass Babe", score: 10450 },
-            { id: "654987321", name: "Tempo Titan", score: 9870 },
-            { id: "147258369", name: "Melody Maven", score: 9450 },
-            { id: "258369147", name: "Syncopation King", score: 8920 },
-            { id: "369147258", name: "Harmony Hero", score: 8450 },
-            { id: "741852963", name: "Drop Diva", score: 7980 }
-        ];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const entranceScreen = document.getElementById('entrance-screen');
-            const leaderboard = document.getElementById('leaderboard');
-            const leaderboardBody = document.getElementById('leaderboard-body');
-            const searchButton = document.getElementById('search-button');
-            const userSearch = document.getElementById('user-search');
-            
-            // Create audio element
-            const audio = new Audio('https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/heheee.mp3');
-            
-            // Handle click anywhere to enter
-            document.body.addEventListener('click', function() {
-                if (entranceScreen.style.display !== 'none') {
-                    // Play the sound
-                    audio.play().catch(e => {
-                        console.log('Audio play failed:', e);
-                        // If audio fails, still show the leaderboard
-                        showLeaderboard();
-                    });
-                    
-                    // Show the leaderboard
-                    showLeaderboard();
-                }
-            });
-            
-            function showLeaderboard() {
-                // Fade out entrance screen
-                entranceScreen.style.opacity = '0';
-                
-                // After fade out, hide entrance and show leaderboard
-                setTimeout(function() {
-                    entranceScreen.style.display = 'none';
-                    leaderboard.style.display = 'block';
-                    
-                    // Add a slight animation to the leaderboard
-                    leaderboard.style.opacity = '0';
-                    leaderboard.style.transform = 'translateY(20px)';
-                    
-                    setTimeout(function() {
-                        leaderboard.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-                        leaderboard.style.opacity = '1';
-                        leaderboard.style.transform = 'translateY(0)';
-                    }, 100);
-                    
-                    // Populate leaderboard
-                    populateLeaderboard();
-                }, 800);
-            }
-            
-            function populateLeaderboard() {
-                leaderboardBody.innerHTML = '';
-                
-                leaderboardData.forEach((player, index) => {
-                    const row = document.createElement('tr');
-                    if (index < 3) {
-                        row.classList.add('top-player');
-                    }
-                    
-                    const rankCell = document.createElement('td');
-                    rankCell.className = `rank rank-${index + 1}`;
-                    rankCell.textContent = index + 1;
-                    
-                    const playerCell = document.createElement('td');
-                    playerCell.className = 'player-info';
-                    
-                    // Create avatar element
-                    const avatar = document.createElement('img');
-                    avatar.className = 'player-avatar';
-                    avatar.src = `https://cdn.discordapp.com/avatars/${player.id}/a_abc123def456.png?size=64`;
-                    avatar.alt = `${player.name}'s avatar`;
-                    avatar.onerror = function() {
-                        // If avatar fails to load, use a placeholder
-                        this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM4QTJCRTIiLz4KPHN2ZyB4PSIxNiIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTE2IDE2QzE4LjIwOTEgMTYgMjAgMTQuMjA5MSAyMCAxMkMyMCA5Ljc5MDg2IDE4LjIwOTEgOCAxNiA4QzEzLjc5MDkgOCAxMiA5Ljc5MDg2IDEyIDEyQzEyIDE0LjIwOTEgMTMuNzkwOSAxNiAxNiAxNloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xNiAxOEMxMi42ODYzIDE4IDEwIDIwLjY4NjMgMTAgMjRWMjZIMjJWMjRDMjIgMjAuNjg2MyAxOS4zMTM3IDE4IDE2IDE4WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=';
-                    };
-                    
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'player-name';
-                    nameSpan.textContent = player.name;
-                    
-                    playerCell.appendChild(avatar);
-                    playerCell.appendChild(nameSpan);
-                    
-                    const scoreCell = document.createElement('td');
-                    scoreCell.className = 'score';
-                    scoreCell.textContent = player.score.toLocaleString();
-                    
-                    row.appendChild(rankCell);
-                    row.appendChild(playerCell);
-                    row.appendChild(scoreCell);
-                    
-                    leaderboardBody.appendChild(row);
-                });
-            }
-            
-            // Handle search functionality
-            searchButton.addEventListener('click', function() {
-                const userId = userSearch.value.trim();
-                if (userId) {
-                    // In a real implementation, you would fetch user data from Discord API
-                    // For this demo, we'll just show an alert
-                    alert(`Searching for user with ID: ${userId}\n\nIn a real implementation, this would fetch the user's Discord profile picture and display their stats.`);
-                    
-                    // Clear the search input
-                    userSearch.value = '';
-                }
-            });
-            
-            // Allow pressing Enter to search
-            userSearch.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchButton.click();
-                }
-            });
-        });
-    </script>
+  <!-- STARFALL BACKGROUND -->
+  <div class="stars" id="stars"></div>
+
+  <!-- LOADER -->
+  <div id="loader" tabindex="0" role="button" aria-label="Enter leaderboard">
+    <div id="logo">E Dancing Leaderboard</div>
+    <div style="margin-top:18px;color:#999;font-size:1.15rem;">Click or press Enter</div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
+    <h1>E Dancing Leaderboard</h1>
+
+    <div id="loading" style="text-align:center;color:#bbb;margin:20px 0;font-size:.96rem;">
+      Loading leaderboard...
+    </div>
+
+    <div class="table-container">
+      <table id="board" class="hidden">
+        <thead>
+          <tr>
+            <th style="width:60px">Rank</th>
+            <th>Player</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div class="last-updated" id="updated"></div>
+
+    <footer>
+      Auto-refreshed • <a href="leaderboard.json" target="_blank">view raw JSON</a>
+      <div class="credit">Site made by mev/vsqz</div>
+    </footer>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // ────── STARFALL ANIMATION ──────
+    function createStar() {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 3 + 1;
+      star.style.width = star.style.height = `${size}px`;
+      star.style.left = `${Math.random() * 100}vw`;
+      star.style.animationDuration = `${Math.random() * 8 + 5}s`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      star.style.opacity = Math.random() * 0.6 + 0.3;
+      $('#stars').appendChild(star);
+      setTimeout(() => star.remove(), 15000);
+    }
+    setInterval(createStar, 300);
+    for (let i = 0; i < 40; i++) setTimeout(createStar, i * 100);
+
+    // ────── DISCORD PFP HELPER ──────
+    function getDiscordAvatar(userId, avatarHash, size = 80) {
+      if (!userId || !avatarHash) return `https://cdn.discordapp.com/embed/avatars/0.png`;
+      const ext = avatarHash.startsWith('a_') ? 'gif' : 'webp';
+      return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=${size}`;
+    }
+
+    // ────── LOADER ──────
+    function enterLeaderboard() {
+      const loader = $('loader');
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        $('app').classList.remove('hidden');
+        fetchLeaderboard();
+        setInterval(fetchLeaderboard, 90000);
+      }, 1000);
+    }
+    $('loader').addEventListener('click', enterLeaderboard);
+    $('loader').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        enterLeaderboard();
+      }
+    });
+    setTimeout(() => $('loader').focus(), 100);
+
+    // ────── FETCH LEADERBOARD ──────
+    async function fetchLeaderboard() {
+      const loading = $('loading');
+      const board = $('board');
+      const rows = $('rows');
+      const updated = $('updated');
+      try {
+        const res = await fetch('leaderboard.json?' + Date.now());
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+        let list = Array.isArray(data) ? data : (data.leaderboard || []);
+        const time = data.updated || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        const paddedList = [];
+        for (let i = 0; i < 100; i++) {
+          paddedList.push(list[i] || { rank: i + 1 });
+        }
+
+        rows.innerHTML = paddedList.map((p, idx) => {
+          const hasData = p.name || p.discord;
+          const avatarUrl = getDiscordAvatar(p.discordId, p.avatar);
+          const rank = p.rank || (idx + 1);
+          return `
+            <tr>
+              <td class="rank">${rank}</td>
+              <td class="name">
+                ${hasData ? `
+                <div class="avatar">
+                  <img src="${avatarUrl}"
+                       onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"
+                       alt="${e(p.name || 'User')} avatar">
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:.98rem;">${e(p.name || 'Unknown')}</div>
+                  ${p.discord ? `<div class="discord-tag"><i class="fab fa-discord"></i>${e(p.discord)}</div>` : ''}
+                </div>
+                ` : `<div class="empty-slot">— Empty Slot —</div>`}
+              </td>
+            </tr>`;
+        }).join('');
+
+        updated.textContent = `Last updated: ${time}`;
+        loading.classList.add('hidden');
+        board.classList.remove('hidden');
+      } catch (err) {
+        loading.textContent = 'Failed to load leaderboard.';
+        loading.style.color = '#f88';
+      }
+    }
+
+    // ────── ESCAPE HTML ──────
+    function e(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+  </script>
 </body>
 </html>

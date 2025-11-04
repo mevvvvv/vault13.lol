@@ -9,9 +9,9 @@
 
         :root {
             --bg: #000;
-            --card: rgba(8, 8, 12, 0.1);
-            --border: rgba(255, 255, 255, 0.1);
-            --glow: rgba(255, 255, 255, 0.05);
+            --card: rgba(8, 8, 12, 0.05);
+            --border: rgba(255, 255, 255, 0.05);
+            --glow: rgba(255, 255, 255, 0.03);
             --text: #fff;
             --subtext: #ccc;
         }
@@ -170,6 +170,21 @@
             min-height: 1.2em;
             overflow: hidden;
             white-space: nowrap;
+        }
+
+        /* Owner Info Section */
+        .owner-info {
+            font-size: 0.85rem;
+            color: #ffffff;
+            margin-bottom: 1.2rem;
+            min-height: 1.2em;
+            letter-spacing: 0.05em;
+            overflow: hidden;
+            white-space: nowrap;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #000;
+            opacity: 0.8;
         }
 
         /* Bio with Typewriter Effect */
@@ -353,6 +368,7 @@
             .circle img { width: 22px; height: 22px; }
             .play-btn { width: 34px; height: 34px; font-size: 0.8rem; }
             .song-name { font-size: 0.7rem; }
+            .owner-info { font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -377,6 +393,7 @@
             <img src="https://cdn.discordapp.com/attachments/1363714836621689002/1434441273703534713/mhhh.png?ex=6908570a&is=6907058a&hm=a045d8b3594ec75bfad7b8e8e6cba84a81f8c6fcfe98a68f9c2448370d028124&" alt="pfp" class="pfp">
         </div>
         <div class="name" id="profile-name"></div>
+        <div class="owner-info" id="owner-info"></div>
         <div class="bio" id="bio"></div>
 
         <!-- Circle Links -->
@@ -419,6 +436,7 @@
         const landingTitle = document.getElementById('landing-title');
         const landingSubtitle = document.getElementById('landing-subtitle');
         const profileName = document.getElementById('profile-name');
+        const ownerInfo = document.getElementById('owner-info');
 
         // Remove focus outlines
         document.addEventListener('mousedown', function() {
@@ -490,8 +508,11 @@
                 // Start profile typewriter effects
                 typeWriterRepeat(profileName, "mev/vsqz", 120, 3000);
                 setTimeout(() => {
-                    typeWriterRepeat(bio, "Gate Way To Hell", 100, 2500);
+                    typeWriterRepeat(ownerInfo, "Owner of @6kux, @4yta, @0j62 , @3pn6, @4bph, @8lda, @f7ev, @xw0v, @7kpu, @7kpk, @d4o2, @8usf, @0r1h", 80, 4000);
                 }, 1000);
+                setTimeout(() => {
+                    typeWriterRepeat(bio, "Gate Way To Hell", 100, 2500);
+                }, 2000);
             }, 1400);
         }
 

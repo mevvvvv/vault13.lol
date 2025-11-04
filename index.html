@@ -108,26 +108,95 @@
             100% { opacity: 0; filter: blur(14px); transform: scale(1.05); }
         }
 
+        /* Container for both frames */
+        .frames-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 5;
+            width: 90%;
+            max-width: 900px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
         /* Ultra-Ghost Frame */
         #frame {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) perspective(1000px);
-            width: 90%;
-            max-width: 460px;
+            width: 460px;
             background: var(--card);
             border: 1.2px solid var(--border);
             border-radius: 16px;
             padding: 2rem 1.8rem;
             text-align: center;
             backdrop-filter: blur(8px);
-            z-index: 5;
             opacity: 0;
             pointer-events: none;
             transition: opacity 1s ease;
             transform-style: preserve-3d;
         }
         #frame.in { opacity: 1; pointer-events: all; }
+
+        /* Side Panel Frame */
+        #side-frame {
+            width: 300px;
+            background: var(--card);
+            border: 1.2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            transform-style: preserve-3d;
+        }
+        #side-frame.in { opacity: 1; pointer-events: all; }
+
+        .side-title {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            letter-spacing: 0.1em;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #000,
+                0 0 20px #000;
+        }
+
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .account-item {
+            display: flex;
+            align-items: center;
+            padding: 0.7rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .account-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(5px);
+        }
+
+        .account-name {
+            font-size: 0.9rem;
+            color: #ffffff;
+            letter-spacing: 0.05em;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #000;
+        }
 
         .pfp-ring {
             position: relative;
@@ -170,21 +239,6 @@
             min-height: 1.2em;
             overflow: hidden;
             white-space: nowrap;
-        }
-
-        /* Owner Info Section */
-        .owner-info {
-            font-size: 0.85rem;
-            color: #ffffff;
-            margin-bottom: 1.2rem;
-            min-height: 1.2em;
-            letter-spacing: 0.05em;
-            overflow: hidden;
-            white-space: nowrap;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #000;
-            opacity: 0.8;
         }
 
         /* Bio with Typewriter Effect */
@@ -360,7 +414,18 @@
         }
 
         /* Mobile */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+            .frames-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+            }
+            
+            #frame, #side-frame {
+                width: 90%;
+                max-width: 460px;
+            }
+            
             .title { font-size: 2.2rem; }
             .enter { font-size: 0.85rem; }
             #frame { padding: 1.6rem; }
@@ -368,7 +433,6 @@
             .circle img { width: 22px; height: 22px; }
             .play-btn { width: 34px; height: 34px; font-size: 0.8rem; }
             .song-name { font-size: 0.7rem; }
-            .owner-info { font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -386,27 +450,37 @@
     <!-- Audio (Loop Forever) -->
     <audio id="hellsong" src="https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/freestyle.mp3" loop preload="auto"></audio>
 
-    <!-- Main Frame -->
-    <div id="frame">
-        <div class="pfp-ring">
-            <div class="ring-glow"></div>
-            <img src="https://cdn.discordapp.com/attachments/1363714836621689002/1434441273703534713/mhhh.png?ex=6908570a&is=6907058a&hm=a045d8b3594ec75bfad7b8e8e6cba84a81f8c6fcfe98a68f9c2448370d028124&" alt="pfp" class="pfp">
-        </div>
-        <div class="name" id="profile-name"></div>
-        <div class="owner-info" id="owner-info"></div>
-        <div class="bio" id="bio"></div>
+    <!-- Frames Container -->
+    <div class="frames-container">
+        <!-- Main Frame -->
+        <div id="frame">
+            <div class="pfp-ring">
+                <div class="ring-glow"></div>
+                <img src="https://cdn.discordapp.com/attachments/1363714836621689002/1434441273703534713/mhhh.png?ex=6908570a&is=6907058a&hm=a045d8b3594ec75bfad7b8e8e6cba84a81f8c6fcfe98a68f9c2448370d028124&" alt="pfp" class="pfp">
+            </div>
+            <div class="name" id="profile-name"></div>
+            <div class="bio" id="bio"></div>
 
-        <!-- Circle Links -->
-        <div class="circle-links">
-            <a href="https://discord.gg/bkNT9x3qs9" target="_blank" class="circle">
-                <img src="https://cdn.simpleicons.org/discord/white" alt="Discord">
-            </a>
-            <a href="https://www.roblox.com/users/7758899851/profile" target="_blank" class="circle">
-                <img src="https://cdn.simpleicons.org/roblox/white" alt="Roblox">
-            </a>
-            <a href="https://github.com/mevvvvv" target="_blank" class="circle">
-                <img src="https://cdn.simpleicons.org/github/white" alt="GitHub">
-            </a>
+            <!-- Circle Links -->
+            <div class="circle-links">
+                <a href="https://discord.gg/bkNT9x3qs9" target="_blank" class="circle">
+                    <img src="https://cdn.simpleicons.org/discord/white" alt="Discord">
+                </a>
+                <a href="https://www.roblox.com/users/7758899851/profile" target="_blank" class="circle">
+                    <img src="https://cdn.simpleicons.org/roblox/white" alt="Roblox">
+                </a>
+                <a href="https://github.com/mevvvvv" target="_blank" class="circle">
+                    <img src="https://cdn.simpleicons.org/github/white" alt="GitHub">
+                </a>
+            </div>
+        </div>
+
+        <!-- Side Frame for Discord Accounts -->
+        <div id="side-frame">
+            <div class="side-title">4-Letter Discord Accounts</div>
+            <div class="accounts-list" id="accounts-list">
+                <!-- Accounts will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -429,6 +503,7 @@
         const audio = document.getElementById('hellsong');
         const progress = document.getElementById('progress');
         const frame = document.getElementById('frame');
+        const sideFrame = document.getElementById('side-frame');
         const player = document.getElementById('audio-player');
         const playBtn = document.getElementById('play-btn');
         const volumeSlider = document.getElementById('volume-slider');
@@ -436,7 +511,24 @@
         const landingTitle = document.getElementById('landing-title');
         const landingSubtitle = document.getElementById('landing-subtitle');
         const profileName = document.getElementById('profile-name');
-        const ownerInfo = document.getElementById('owner-info');
+        const accountsList = document.getElementById('accounts-list');
+
+        // Discord accounts data
+        const discordAccounts = [
+            "@6kux", "@4yta", "@0j62", "@3pn6", "@4bph", "@8lda", 
+            "@f7ev", "@xw0v", "@7kpu", "@7kpk", "@d4o2", "@8usf", "@0r1h"
+        ];
+
+        // Populate accounts list
+        function populateAccounts() {
+            accountsList.innerHTML = '';
+            discordAccounts.forEach(account => {
+                const accountItem = document.createElement('div');
+                accountItem.className = 'account-item';
+                accountItem.innerHTML = `<div class="account-name">${account}</div>`;
+                accountsList.appendChild(accountItem);
+            });
+        }
 
         // Remove focus outlines
         document.addEventListener('mousedown', function() {
@@ -490,6 +582,7 @@
 
         // Start typewriter effects on page load
         window.onload = function() {
+            populateAccounts();
             typeWriterRepeat(landingTitle, "mev/vsqz", 120, 3000);
             setTimeout(() => {
                 typeWriterRepeat(landingSubtitle, "click to enter hell", 80, 2500);
@@ -503,16 +596,14 @@
             setTimeout(() => {
                 document.getElementById('landing').style.display = 'none';
                 frame.classList.add('in');
+                sideFrame.classList.add('in');
                 player.classList.add('show');
                 
                 // Start profile typewriter effects
                 typeWriterRepeat(profileName, "mev/vsqz", 120, 3000);
                 setTimeout(() => {
-                    typeWriterRepeat(ownerInfo, "Owner of @6kux, @4yta, @0j62 , @3pn6, @4bph, @8lda, @f7ev, @xw0v, @7kpu, @7kpk, @d4o2, @8usf, @0r1h", 80, 4000);
-                }, 1000);
-                setTimeout(() => {
                     typeWriterRepeat(bio, "Gate Way To Hell", 100, 2500);
-                }, 2000);
+                }, 1000);
             }, 1400);
         }
 
@@ -538,15 +629,17 @@
             audio.volume = volumeSlider.value;
         });
 
-        // Mouse Tilt
+        // Mouse Tilt for both frames
         document.addEventListener('mousemove', (e) => {
             if (!frame.classList.contains('in')) return;
             const x = (window.innerWidth / 2 - e.clientX) / 45;
             const y = (window.innerHeight / 2 - e.clientY) / 45;
-            frame.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${y}deg) rotateY(${x}deg)`;
+            frame.style.transform = `perspective(1000px) rotateX(${y}deg) rotateY(${x}deg)`;
+            sideFrame.style.transform = `perspective(1000px) rotateX(${y}deg) rotateY(${x}deg)`;
         });
         document.addEventListener('mouseleave', () => {
-            frame.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0) rotateY(0)`;
+            frame.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
+            sideFrame.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
         });
     </script>
 

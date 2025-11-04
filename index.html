@@ -3,52 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mev/vsqz</title>
+    <title>mev/vsqz | VOIDGATE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Share+Tech+Mono&display=swap');
+        
         :root {
             --bg: #000;
-            --card: rgba(8, 8, 12, 0.05);
-            --border: rgba(255, 255, 255, 0.05);
-            --glow: rgba(255, 255, 255, 0.03);
-            --text: #fff;
-            --subtext: #ccc;
+            --card: rgba(15, 15, 15, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --glow: rgba(255, 255, 255, 0.15);
+            --text: #ffffff;
+            --subtext: #cccccc;
+            --accent: #ffffff;
+            --noise-opacity: 0.05;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             outline: none;
-        }
-        
-        html, body { 
-            height: 100%; 
-            overflow: hidden; 
-            background: var(--bg); 
-            font-family: 'Orbitron', sans-serif; 
+            user-select: none;
         }
 
-        /* Remove text selection */
-        *::selection {
-            background: transparent;
-        }
-        *::-moz-selection {
-            background: transparent;
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            font-family: 'Orbitron', sans-serif;
+            cursor: none;
+            filter: contrast(1.1) brightness(1.05);
         }
 
-        /* Background GIF */
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.08s ease, opacity 0.3s ease;
+            box-shadow: 0 0 12px var(--accent), 0 0 25px var(--accent);
+            mix-blend-mode: difference;
+        }
+        .cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 5px; height: 5px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Noise Overlay */
+        .noise {
+            position: fixed;
+            inset: 0;
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAPklEQVQYV2NkYGD4z8DAwMgABXAGBgaG/////38GRiYGP/7/TPD/f4ZGBgYQP/5nYGRgYGBgYGBgYGBgYGBgYGBgAOXpAb4hM7oAAAAASUVORK5CYII=') repeat;
+            opacity: var(--noise-opacity);
+            pointer-events: none;
+            z-index: 1;
+            animation: noise 0.15s steps(2) infinite;
+        }
+        @keyframes noise { 0% { transform: translate(0,0); } 100% { transform: translate(1px,1px); } }
+
+        /* Background GIF - Desaturated */
         .bg-gif {
             position: fixed;
             top: 50%; left: 50%;
-            min-width: 100%; min-height: 100%;
+            min-width: 110%; min-height: 110%;
             width: auto; height: auto;
             transform: translate(-50%, -50%);
             z-index: 0;
             object-fit: cover;
-            filter: brightness(0.9) contrast(1.2);
+            filter: grayscale(100%) brightness(0.8) contrast(1.3);
+            transition: filter 0.6s ease;
+        }
+
+        /* Scanlines */
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.04), rgba(0,0,0,0.04) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.7;
         }
 
         /* Landing */
@@ -60,382 +106,400 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
-            cursor: pointer;
-            user-select: none;
+            cursor: none;
+            backdrop-filter: blur(10px) grayscale(100%);
         }
-
         .title {
-            font-size: 2.8rem;
+            font-size: 3.2rem;
             font-weight: 900;
-            color: #ffffff;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #fff,
-                0 0 20px #000,
-                0 0 35px #000,
-                0 0 40px #000;
-            letter-spacing: 0.15em;
+            color: var(--text);
+            letter-spacing: 0.18em;
             margin-bottom: 0.8rem;
             min-height: 1.2em;
             overflow: hidden;
             white-space: nowrap;
-        }
-
-        .enter {
-            font-size: 1rem;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 500;
             text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #000,
-                0 0 20px #000;
+                0 0 15px var(--glow),
+                0 0 30px var(--glow),
+                0 0 50px var(--glow);
+            animation: titleFlicker 4s infinite alternate;
+        }
+        @keyframes titleFlicker {
+            0%, 100% { text-shadow: 0 0 15px #fff, 0 0 30px #fff; }
+            50% { text-shadow: 0 0 25px #fff, 0 0 50px #fff, 0 0 70px #fff; }
+        }
+        .enter {
+            font-size: 1.1rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-weight: 500;
             min-height: 1.2em;
             overflow: hidden;
             white-space: nowrap;
+            opacity: 0.85;
+            animation: pulseEnter 2.2s infinite;
+            text-shadow: 0 0 10px var(--glow);
+        }
+        @keyframes pulseEnter {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
         }
 
         /* Fade Out */
         #landing.out {
-            animation: fadeOut 1.4s forwards;
+            animation: voidExit 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             pointer-events: none;
         }
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; filter: blur(14px); transform: scale(1.05); }
+        @keyframes voidExit {
+            0% { opacity: 1; filter: blur(0); transform: scale(1); }
+            100% { opacity: 0; filter: blur(25px); transform: scale(1.25); }
         }
 
-        /* Container for both frames */
+        /* Frames Container */
         .frames-container {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
-            gap: 1.5rem;
+            gap: 1.8rem;
             z-index: 5;
             width: 95%;
-            max-width: 850px;
+            max-width: 900px;
             justify-content: center;
             align-items: flex-start;
+            perspective: 1500px;
         }
 
-        /* Ultra-Ghost Frame */
-        #frame {
-            width: 380px;
+        /* Ghost Frame - Pure Transparency */
+        #frame, #side-frame {
             background: var(--card);
-            border: 1.2px solid var(--border);
-            border-radius: 16px;
-            padding: 1.8rem 1.5rem;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem 1.8rem;
             text-align: center;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(18px) grayscale(100%);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 1s ease;
+            transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 
+                0 10px 35px rgba(0,0,0,0.4),
+                0 0 25px var(--glow),
+                inset 0 0 20px rgba(255,255,255,0.04);
             transform-style: preserve-3d;
         }
         #frame.in { opacity: 1; pointer-events: all; }
-
-        /* Side Panel Frame */
-        #side-frame {
-            width: 240px;
-            background: var(--card);
-            border: 1.2px solid var(--border);
-            border-radius: 16px;
-            padding: 1.2rem;
-            backdrop-filter: blur(8px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1s ease;
-            transform-style: preserve-3d;
-        }
         #side-frame.in { opacity: 1; pointer-events: all; }
 
-        .side-title {
-            font-size: 1rem;
-            font-weight: 900;
-            color: #ffffff;
-            margin-bottom: 1rem;
-            text-align: center;
-            letter-spacing: 0.1em;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #000,
-                0 0 20px #000;
+        #frame {
+            width: 400px;
+            background: linear-gradient(135deg, rgba(20,20,25,0.06), rgba(10,10,15,0.03));
+        }
+        #side-frame {
+            width: 260px;
+            background: linear-gradient(135deg, rgba(15,15,20,0.05), rgba(10,10,15,0.02));
         }
 
-        .accounts-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-            max-height: 320px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        /* Custom scrollbar */
-        .accounts-list::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .accounts-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-
-        .accounts-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-
-        .account-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .account-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            transform: translateX(3px);
-        }
-
-        .account-name {
-            font-size: 0.8rem;
-            color: #ffffff;
-            letter-spacing: 0.05em;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #000;
-        }
-
+        /* PFP - Monochrome Holo Ring */
         .pfp-ring {
             position: relative;
-            width: 90px; 
-            height: 90px;
-            margin: 0 auto 1rem;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.2rem;
+            filter: drop-shadow(0 0 12px #fff);
         }
         .pfp {
-            width: 100%; 
+            width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--border);
+            filter: grayscale(100%) brightness(1.1);
+            animation: spinBorder 8s linear infinite;
+        }
+        @keyframes spinBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .ring-glow {
             position: absolute;
-            top: -6px; 
-            left: -6px;
-            width: 102px; 
-            height: 102px;
-            border: 1.5px solid var(--border);
+            top: -8px; left: -8px;
+            width: 116px; height: 116px;
+            border: 2px solid var(--border);
             border-radius: 50%;
-            opacity: 0.2;
-            animation: pulse 5s infinite;
+            opacity: 0.3;
+            animation: pulseMono 5s ease-in-out infinite;
+            box-shadow: 0 0 20px #fff;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.2; }
-            50% { transform: scale(1.25); opacity: 0.05; }
+        @keyframes pulseMono {
+            0%, 100% { transform: scale(1); opacity: 0.25; }
+            50% { transform: scale(1.35); opacity: 0.08; }
         }
 
         .name {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 900;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.1em;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #fff,
-                0 0 20px #000,
-                0 0 35px #000,
-                0 0 40px #000;
+            color: var(--text);
+            letter-spacing: 0.12em;
+            margin-bottom: 0.6rem;
+            text-shadow: 0 0 12px var(--glow);
             min-height: 1.2em;
             overflow: hidden;
             white-space: nowrap;
         }
 
-        /* Bio with Typewriter Effect */
         .bio {
-            font-size: 0.9rem;
-            color: #ffffff;
-            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+            color: #ddd;
+            margin-bottom: 1.4rem;
+            letter-spacing: 0.12em;
+            opacity: 0.92;
             min-height: 1.5em;
-            letter-spacing: 0.1em;
             overflow: hidden;
             white-space: nowrap;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #000,
-                0 0 20px #000;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 8px rgba(255,255,255,0.5);
         }
 
-        /* Circle Links */
+        /* Circle Links - Pure White */
         .circle-links {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 1.2rem;
+            margin-bottom: 1.6rem;
         }
         .circle {
-            width: 42px; 
-            height: 42px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1.2px solid var(--border);
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid var(--border);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        .circle::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.25), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .circle:hover::before {
+            opacity: 1;
         }
         .circle:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: scale(1.2) translateY(-4px);
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.25) translateY(-6px);
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(255,255,255,0.5);
         }
         .circle img {
-            width: 20px; 
-            height: 20px;
+            width: 22px;
+            height: 22px;
             filter: brightness(0) invert(1);
-            opacity: 0.85;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+        .circle:hover img {
+            filter: brightness(0) invert(1) drop-shadow(0 0 10px #fff);
         }
 
-        /* Audio Player */
+        /* Side Panel */
+        .side-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 1rem;
+            text-align: center;
+            letter-spacing: 0.12em;
+            text-shadow: 0 0 10px var(--glow);
+        }
+
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .accounts-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .accounts-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.04);
+            border-radius: 4px;
+        }
+        .accounts-list::-webkit-scrollbar-thumb {
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 0 12px #fff;
+        }
+
+        .account-item {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .account-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s ease;
+        }
+        .account-item:hover::before {
+            left: 100%;
+        }
+        .account-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px) scale(1.02);
+            border-color: #fff;
+            box-shadow: 0 0 18px rgba(255,255,255,0.4);
+        }
+        .account-name {
+            font-size: 0.85rem;
+            color: #fff;
+            letter-spacing: 0.06em;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 6px rgba(255,255,255,0.5);
+        }
+
+        /* Audio Player - Monochrome Hologram */
         #audio-player {
             position: fixed;
-            bottom: 1rem;
+            bottom: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            max-width: 500px;
-            background: rgba(8, 8, 12, 0.1);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 0.6rem 1rem;
+            width: 92%;
+            max-width: 520px;
+            background: rgba(10,10,15,0.08);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 0.8rem 1.2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             z-index: 100;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 1s ease;
-            backdrop-filter: blur(8px);
+            transition: all 1.2s ease;
+            backdrop-filter: blur(22px) grayscale(100%);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.5), 0 0 25px var(--glow);
         }
         #audio-player.show { opacity: 1; pointer-events: all; }
 
         .song-name {
-            font-size: 0.75rem;
-            color: #ffffff;
+            font-size: 0.8rem;
+            color: #fff;
             font-weight: 600;
-            letter-spacing: 0.05em;
-            opacity: 0.9;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #000;
+            letter-spacing: 0.06em;
+            opacity: 0.95;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 8px #fff;
         }
 
         .player-controls {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.2rem;
             width: 100%;
         }
 
         .play-btn {
-            background: none;
-            border: 1.2px solid var(--border);
-            color: #ffffff;
-            width: 34px; 
-            height: 34px;
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid var(--border);
+            color: #fff;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #000;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 12px rgba(255,255,255,0.4);
         }
         .play-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            transform: scale(1.12);
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.15);
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(255,255,255,0.7);
         }
 
         .progress-container {
             flex: 1;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
+            height: 5px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
             overflow: hidden;
-            margin: 0 0.8rem;
+            margin: 0 1rem;
+            position: relative;
         }
         .progress {
             height: 100%;
             background: #ffffff;
             width: 0%;
-            border-radius: 2px;
-            opacity: 0.7;
-            box-shadow: 0 0 5px #fff, 0 0 10px #000;
+            border-radius: 3px;
+            box-shadow: 0 0 15px #fff;
+            position: relative;
+        }
+        .progress::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 50%;
+            width: 8px; height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px #fff;
         }
 
-        /* Volume Control */
+        /* Volume */
         .volume-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
         }
-
         .volume-icon {
-            color: #ffffff;
-            font-size: 0.8rem;
-            opacity: 0.8;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #000;
+            color: #fff;
+            font-size: 0.85rem;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 5px #fff);
         }
-
         .volume-slider {
-            width: 60px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
+            width: 70px;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
             outline: none;
             -webkit-appearance: none;
         }
-
         .volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: #ffffff;
             cursor: pointer;
-            opacity: 0.8;
-            box-shadow: 0 0 5px #fff, 0 0 10px #000;
-        }
-
-        .volume-slider::-moz-range-thumb {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ffffff;
-            cursor: pointer;
-            opacity: 0.8;
-            border: none;
-            box-shadow: 0 0 5px #fff, 0 0 10px #000;
+            box-shadow: 0 0 15px #fff;
         }
 
         /* Mobile */
@@ -443,27 +507,28 @@
             .frames-container {
                 flex-direction: column;
                 align-items: center;
-                gap: 1.2rem;
+                gap: 1.5rem;
             }
-            
             #frame, #side-frame {
-                width: 90%;
-                max-width: 380px;
+                width: 92%;
+                max-width: 400px;
             }
-            
-            .title { font-size: 2.2rem; }
-            .enter { font-size: 0.85rem; }
-            #frame { padding: 1.5rem; }
-            .circle { width: 40px; height: 40px; }
-            .circle img { width: 18px; height: 18px; }
-            .play-btn { width: 32px; height: 32px; font-size: 0.75rem; }
-            .song-name { font-size: 0.7rem; }
+            .title { font-size: 2.5rem; }
+            .enter { font-size: 0.9rem; }
+            .circle { width: 44px; height: 44px; }
+            .circle img { width: 20px; height: 20px; }
         }
     </style>
 </head>
 <body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
 
-    <!-- Background GIF -->
+    <!-- Noise & Scanlines -->
+    <div class="noise"></div>
+    <div class="scanlines"></div>
+
+    <!-- Background GIF (B&W) -->
     <img src="https://vault13.lol/bmw-m3-nohesi.gif" class="bg-gif" alt="bg">
 
     <!-- Landing -->
@@ -472,12 +537,11 @@
         <div class="enter" id="landing-subtitle"></div>
     </div>
 
-    <!-- Audio (Loop Forever) -->
+    <!-- Audio -->
     <audio id="hellsong" src="https://github.com/mevvvvv/vault13.lol/raw/refs/heads/main/freestyle.mp3" loop preload="auto"></audio>
 
-    <!-- Frames Container -->
+    <!-- Frames -->
     <div class="frames-container">
-        <!-- Main Frame -->
         <div id="frame">
             <div class="pfp-ring">
                 <div class="ring-glow"></div>
@@ -485,8 +549,6 @@
             </div>
             <div class="name" id="profile-name"></div>
             <div class="bio" id="bio"></div>
-
-            <!-- Circle Links -->
             <div class="circle-links">
                 <a href="https://discord.gg/bkNT9x3qs9" target="_blank" class="circle">
                     <img src="https://cdn.simpleicons.org/discord/white" alt="Discord">
@@ -500,12 +562,9 @@
             </div>
         </div>
 
-        <!-- Side Frame for Discord Accounts -->
         <div id="side-frame">
             <div class="side-title">4-Letter Discord Accounts</div>
-            <div class="accounts-list" id="accounts-list">
-                <!-- Accounts will be populated by JavaScript -->
-            </div>
+            <div class="accounts-list" id="accounts-list"></div>
         </div>
     </div>
 
@@ -513,18 +572,20 @@
     <div id="audio-player">
         <div class="song-name">Freestyle - mev/vsqz</div>
         <div class="player-controls">
-            <button class="play-btn" id="play-btn">▶</button>
+            <button class="play-btn" id="play-btn">Play</button>
             <div class="progress-container">
                 <div class="progress" id="progress"></div>
             </div>
             <div class="volume-container">
-                <span class="volume-icon">🔊</span>
+                <span class="volume-icon">Volume</span>
                 <input type="range" min="0" max="1" step="0.01" value="0.5" class="volume-slider" id="volume-slider">
             </div>
         </div>
     </div>
 
     <script>
+        // === ELEMENTS ===
+        const cursor = document.querySelector('.cursor');
         const audio = document.getElementById('hellsong');
         const progress = document.getElementById('progress');
         const frame = document.getElementById('frame');
@@ -537,136 +598,108 @@
         const landingSubtitle = document.getElementById('landing-subtitle');
         const profileName = document.getElementById('profile-name');
         const accountsList = document.getElementById('accounts-list');
+        const bgGif = document.querySelector('.bg-gif');
 
-        // Discord accounts data
+        // === DATA ===
         const discordAccounts = [
-            "@6kux", "@4yta", "@0j62", "@3pn6", "@4bph", "@8lda", 
+            "@6kux", "@4yta", "@0j62", "@3pn6", "@4bph", "@8lda",
             "@f7ev", "@xw0v", "@7kpu", "@7kpk", "@d4o2", "@8usf", "@0r1h"
         ];
 
-        // Populate accounts list
-        function populateAccounts() {
-            accountsList.innerHTML = '';
-            discordAccounts.forEach(account => {
-                const accountItem = document.createElement('div');
-                accountItem.className = 'account-item';
-                accountItem.innerHTML = `<div class="account-name">${account}</div>`;
-                accountsList.appendChild(accountItem);
-            });
-        }
-
-        // Remove focus outlines
-        document.addEventListener('mousedown', function() {
-            document.activeElement.blur();
+        // === CURSOR + TILT ===
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate(${e.clientX - 9}px, ${e.clientY - 9}px)`;
+            if (frame.classList.contains('in')) {
+                const x = (window.innerWidth / 2 - e.clientX) / 35;
+                const y = (window.innerHeight / 2 - e.clientY) / 35;
+                frame.style.transform = `perspective(1500px) rotateX(${y}deg) rotateY(${x}deg) translateZ(12px)`;
+                sideFrame.style.transform = `perspective(1500px) rotateX(${y}deg) rotateY(${x}deg) translateZ(12px)`;
+            }
         });
 
-        // Force loop
-        audio.loop = true;
-        audio.onended = () => audio.play();
+        document.addEventListener('mouseleave', () => {
+            frame.style.transform = `perspective(1500px) rotateX(0) rotateY(0)`;
+            sideFrame.style.transform = `perspective(1500px) rotateX(0) rotateY(0)`;
+        });
 
-        // Typewriter function with delete and repeat
+        // === PARALLAX BG ===
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 18;
+            const y = (e.clientY / window.innerHeight - 0.5) * 18;
+            bgGif.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1.1)`;
+        });
+
+        // === TYPEWRITER ===
         function typeWriterRepeat(element, text, speed = 100, pause = 2000) {
-            let isDeleting = false;
-            let i = 0;
-            
+            let i = 0, isDeleting = false;
             function type() {
-                const currentText = text.substring(0, i);
-                
-                if (!isDeleting) {
-                    // Typing phase
-                    element.textContent = currentText;
-                    i++;
-                    
-                    if (i > text.length) {
-                        // Finished typing, pause then start deleting
-                        setTimeout(() => {
-                            isDeleting = true;
-                            type();
-                        }, pause);
-                        return;
-                    }
+                const current = text.substring(0, i);
+                element.textContent = current;
+                if (!isDeleting && i === text.length) {
+                    setTimeout(() => { isDeleting = true; type(); }, pause);
+                } else if (isDeleting && i === 0) {
+                    isDeleting = false;
+                    setTimeout(type, speed * 2);
                 } else {
-                    // Deleting phase
-                    element.textContent = currentText;
-                    i--;
-                    
-                    if (i === 0) {
-                        // Finished deleting, pause then start typing again
-                        isDeleting = false;
-                        setTimeout(type, speed * 2);
-                        return;
-                    }
+                    i += isDeleting ? -1 : 1;
+                    setTimeout(type, isDeleting ? speed / 2 : speed);
                 }
-                
-                setTimeout(type, isDeleting ? speed / 2 : speed);
             }
-            
-            // Start the animation
             type();
         }
 
-        // Start typewriter effects on page load
-        window.onload = function() {
-            populateAccounts();
-            typeWriterRepeat(landingTitle, "mev/vsqz", 120, 3000);
-            setTimeout(() => {
-                typeWriterRepeat(landingSubtitle, "click to enter hell", 80, 2500);
-            }, 1000);
-        };
-
-        // Enter
+        // === ENTER ===
         function enter() {
             document.getElementById('landing').classList.add('out');
-            audio.play();
+            audio.play().catch(() => {});
             setTimeout(() => {
                 document.getElementById('landing').style.display = 'none';
                 frame.classList.add('in');
                 sideFrame.classList.add('in');
                 player.classList.add('show');
-                
-                // Start profile typewriter effects
                 typeWriterRepeat(profileName, "mev/vsqz", 120, 3000);
-                setTimeout(() => {
-                    typeWriterRepeat(bio, "Gate Way To Hell", 100, 2500);
-                }, 1000);
-            }, 1400);
+                setTimeout(() => typeWriterRepeat(bio, "Gate Way To Hell", 90, 2500), 1200);
+            }, 1500);
         }
 
-        // Play/Pause button
+        // === AUDIO ===
         playBtn.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
-                playBtn.textContent = '❚❚';
+                playBtn.textContent = 'Pause';
             } else {
                 audio.pause();
-                playBtn.textContent = '▶';
+                playBtn.textContent = 'Play';
             }
         });
 
-        // Progress bar (visual only)
         audio.ontimeupdate = () => {
             const percent = (audio.currentTime / audio.duration) * 100 || 0;
             progress.style.width = percent + '%';
         };
 
-        // Volume control
         volumeSlider.addEventListener('input', () => {
             audio.volume = volumeSlider.value;
         });
 
-        // Mouse Tilt for both frames
-        document.addEventListener('mousemove', (e) => {
-            if (!frame.classList.contains('in')) return;
-            const x = (window.innerWidth / 2 - e.clientX) / 45;
-            const y = (window.innerHeight / 2 - e.clientY) / 45;
-            frame.style.transform = `perspective(1000px) rotateX(${y}deg) rotateY(${x}deg)`;
-            sideFrame.style.transform = `perspective(1000px) rotateX(${y}deg) rotateY(${x}deg)`;
-        });
-        document.addEventListener('mouseleave', () => {
-            frame.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
-            sideFrame.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
-        });
-    </script>
+        // === ACCOUNTS ===
+        function populateAccounts() {
+            accountsList.innerHTML = '';
+            discordAccounts.forEach(acc => {
+                const item = document.createElement('div');
+                item.className = 'account-item';
+                item.innerHTML = `<div class="account-name">${acc}</div>`;
+                accountsList.appendChild(item);
+            });
+        }
 
+        // === INIT ===
+        window.onload = () => {
+            populateAccounts();
+            typeWriterRepeat(landingTitle, "mev/vsqz", 120, 3000);
+            setTimeout(() => typeWriterRepeat(landingSubtitle, "click to enter hell", 80, 2500), 1000);
+            audio.volume = 0.5;
+        };
+    </script>
 </body>
 </html>
